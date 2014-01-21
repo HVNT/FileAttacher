@@ -1,0 +1,87 @@
+﻿<style>
+    #fine-uploader {
+        margin-top:15px;
+        padding-left:20px;
+        padding-right:20px;
+        min-height: 200px;
+    }
+    .table thead tr {
+        margin: 10px 0;
+        font-family: inherit;
+        font-weight: bold;
+        line-height: 20px;
+        color: inherit;
+        text-rendering: optimizelegibility;
+        font-size: 17.5px;
+    }
+    tbody tr .btn {
+        cursor: pointer;
+    }
+    tbody tr i {
+        cursor: pointer;
+    }
+</style>
+
+<div id="ViewModel">
+    <div id="fixHeight" class="container">
+        <div class="row-fluid">
+
+            <div id="careNav" class="span3">
+                <p>STATIC COL SPAN3</p>
+            </div>
+
+            <div id="appContent" class="span9">
+                <span class="span4">discharge notes</span>
+                <span class="offset7">
+                    <button type="button" class="btn btn-default" data-bind="click:ModalViewModel.showModal"><i class="icon-plus-sign"></i></button>
+                </span>
+                <hr />
+
+                <div>
+                    <!-- File(s) table-->
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td>File Name</td>
+                                <td>File Type</td>
+                                <td><i class="icon-download-alt"></i></td>
+                                <td>&nbsp;</td>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: MainViewModel.files">
+                            <tr data-bind="event: {mouseover: $root.MainViewModel.enableDelete, mouseout: $root.MainViewModel.disableDelete}">
+                                <td></td>
+                                <td data-bind="text: Filename"></td>
+                                <td data-bind="text: Extension"></td>
+                                <td><a data-bind="attr: { href: 'http://localhost:1109/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }" class="btn btn-small" target="_blank"><i class="icon-download"></i></a></td>
+                                <td><i data-bind="click:$root.MainViewModel.removeFile" class="icon-trash"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <!-- Create a modal via custom binding -->
+    <div data-bind="bootstrapModal:ModalViewModel.modal" data-keyboard="false" data-backdrop="static"></div>
+
+    <!-- Modal template -->
+    <script id="myModal" type="text/html">
+        <div class="modal-header">
+            <button type="button" class="close" data-bind="click:close" aria-hidden="true">&times;</button>
+            <h3 data-bind="html:header"></h3>
+        </div>
+        <!-- Fine Uploader binding -->
+        <div id="fine-uploader"></div>
+        <div class="modal-footer">
+            <a href="#" class="btn" data-bind="click:close,html:closeLabel"></a>
+            <a href="#" class="btn btn-primary" data-bind="click:action,html:primaryLabel"></a>
+        </div>
+    </script>        
+
+</div>
+
