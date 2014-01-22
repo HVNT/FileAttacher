@@ -16,7 +16,7 @@
         type: "GET",
         contentType: "application/json",
         dataType: "json",
-        url: "/api/FileAtt/GetAll",
+        url: "/api/v1/FileAtt/GetAll",
         success: function (data) {
             console.log(data);
             self.files(data);
@@ -27,13 +27,14 @@
     });
 
     self.removeFile = function (file) {
-        console.log(file);
+
+        var f = file;
 
         $.ajax({
             type: "POST",
             contentType: "application/json",
             dataType: "json",
-            url: "/api/FileAtt/RemoveFile?Id=" + file.Id,
+            url: "/api/v1/FileAtt/RemoveS3File?f=" + f.Id,
             success: function (data) {
                 console.log(data);
                 location.reload();

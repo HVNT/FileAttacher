@@ -14,20 +14,13 @@ namespace FileAttacher.Controllers
 {
     public class FileAttController : RavenApiController
     {
-        //async prop
-        [HttpPost]
-        public async Task<HttpResponseMessage> SaveUploads(List<FileAtt> files)
+
+        public FileAttController()
         {
-
-            var result = await BulkSave(files);
-
-            if (!result.IsValid)
-                return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
-
-            return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value);
+            var test = RequestMessage;
         }
 
-        [HttpGet]
+        [HttpGet, HttpPost]
         public async Task<HttpResponseMessage> GetAll()
         {
 
@@ -39,16 +32,30 @@ namespace FileAttacher.Controllers
             return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value);
         }
 
-        [HttpPost]
-        public async Task<HttpResponseMessage> RemoveFile(string Id)
+        [HttpGet, HttpPost]
+        public async Task<HttpResponseMessage> RemoveS3File(string f)
         {
-            var result = await Remove(Id);
+            var result = await Remove(f);
 
             if(!result.IsValid)
                 return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
 
             return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value); //result.Value = id removed
         }
+
+        //async prop
+        [HttpGet, HttpPost]
+        public async Task<HttpResponseMessage> SaveUploads(List<FileAtt> files)
+        {
+
+            var result = await BulkSave(files);
+
+            if (!result.IsValid)
+                return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
+
+            return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value);
+        }
+
 
         private async Task<Result<List<FileAtt>>> GetFiles()
         {

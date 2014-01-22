@@ -6,7 +6,8 @@ using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
-
+using System.Web.Http.Controllers;
+using System.Web.Http.Routing;
 /*
  * All the controllers inherit from a base controller called RavenApiController. 
  * This controller opens the session to RavenDB when is initialized and then 

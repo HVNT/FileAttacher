@@ -92,7 +92,7 @@ function ModalViewModel() {
             type: "POST",
             contentType: "application/json",
             dataType: "json",
-            url: "/api/FileAtt/SaveUploads",
+            url: "/api/v1/FileAtt/SaveUploads",
             data: JSON.stringify(fArr),
             success: function (data) {
                 location.reload();

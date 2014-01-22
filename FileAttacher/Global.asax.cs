@@ -90,22 +90,29 @@ namespace FileAttacher
 
         public static void RegisterRoutes(RouteCollection routes)
         {
+            /*
+            routes.MapRoute(
+                name: "Default",
+                url: "",
+                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+            );
+             */
             routes.MapHttpRoute(
-                name: "FilesGetAll",
-                routeTemplate: "api/FileAtt/GetAll",
+                name: "GetAllApi",
+                routeTemplate: "api/v1/FileAtt/GetAll",
                 defaults: new { Controller = "FileAtt", Action = "GetAll" },
                 constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
                 );
             routes.MapHttpRoute(
-                name: "SaveUploads",
-                routeTemplate: "api/FileAtt/SaveUploads",
+                name: "SaveUploadsApi",
+                routeTemplate: "api/v1/FileAtt/SaveUploads",
                 defaults: new { Controller = "FileAtt", Action = "SaveUploads" },
-                constraints: new { httpMethod = new HttpMethodConstraint(new[] { "POST" }) }
+                constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
                 );
             routes.MapHttpRoute(
-                name: "RemoveFile",
-                routeTemplate: "api/FileAtt/RemoveFile",
-                defaults: new { Controller = "FileAtt", Action = "RemoveFile", id = RouteParameter.Optional},
+                name: "RemoveS3FileApi",
+                routeTemplate: "api/v1/FileAtt/RemoveS3File",
+                defaults: new { Controller = "FileAtt", Action = "RemoveS3File", id = RouteParameter.Optional },
                 constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
                 );
         }
