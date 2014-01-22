@@ -50,8 +50,12 @@
                             </tr>
                         </thead>
                         <tbody data-bind="foreach: MainViewModel.files">
-                            <tr data-bind="event: {mouseover: $root.MainViewModel.enableDelete, mouseout: $root.MainViewModel.disableDelete}">
-                                <td></td>
+                            <tr>
+                                <td>
+                                    <a id="imgBlow" data-bind="attr: { href: 'http://localhost:1109/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }">
+                                        <i data-bind="click:$root.MainViewModel.showImage, visible: MimeType == 'image/jpeg'" class="icon-fullscreen"></i>
+                                    </a>
+                                </td>
                                 <td data-bind="text: Filename"></td>
                                 <td data-bind="text: MimeType"></td>
                                 <td><a data-bind="attr: { href: 'http://localhost:1109/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }" class="btn btn-small" target="_blank"><i class="icon-download"></i></a></td>
@@ -64,7 +68,6 @@
             </div>
         </div>
     </div>
-
     <!-- MODAL -->
     <!-- Create a modal via custom binding -->
     <div data-bind="bootstrapModal:ModalViewModel.modal" data-keyboard="false" data-backdrop="static"></div>

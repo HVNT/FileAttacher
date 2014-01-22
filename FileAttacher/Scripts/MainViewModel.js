@@ -27,7 +27,6 @@
     });
 
     self.removeFile = function (file) {
-
         var f = file;
 
         $.ajax({
@@ -42,6 +41,13 @@
             error: function (data) {
                 console.log(data);
             }
+        });
+    }
+
+    self.showImage = function (img) {
+
+        $("a#imgBlow").fancybox({
+            'type': 'image'
         });
     }
 }

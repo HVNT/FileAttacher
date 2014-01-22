@@ -16,6 +16,7 @@ namespace FileAttacher
                     "~/Scripts/bootstrap.js",
                     "~/Scripts/respond.js",
                     "~/Scripts/uploader.min.js",
+                    "~/Scripts/jquery.fancybox-1.3.4_patch.js",
                     "~/Scripts/jquery.fineuploader-3.1.min.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/scripts").Include(
@@ -27,6 +28,7 @@ namespace FileAttacher
                     "~/Content/bootstrap.css",
                     "~/Content/bootstrap-responsive.css",
                     "~/Content/site.css",
+                    "~/Content/FancyBox/jquery.fancybox-1.3.4.css",                    
                     "~/Content/FineUploader/fineuploader.css"));
         }
     }
