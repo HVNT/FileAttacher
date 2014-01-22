@@ -82,6 +82,7 @@ namespace FileAttacher.Controllers
                 return null;
             }
 
+            // the MimeType is set on the save now so this is redundant..
             FileContentResult result = new FileContentResult(contents, ReturnExtension(Path.GetExtension(FileName)))
             {
                 FileDownloadName = FileName

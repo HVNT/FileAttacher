@@ -70,7 +70,7 @@ function ModalViewModel() {
                 self.fileAttachs.push(
                     {
                         Key: responseJSON.S3FileName,
-                        // MimeType : MimeType, 
+                        MimeType : '', // set on server side on save
                         Filename: name,
                         Extension: name.slice(name.indexOf('.'), name.length)
                     });

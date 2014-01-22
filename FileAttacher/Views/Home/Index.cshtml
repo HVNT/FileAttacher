@@ -44,7 +44,7 @@
                             <tr>
                                 <td>&nbsp;</td>
                                 <td>File Name</td>
-                                <td>File Type</td>
+                                <td>Type</td>
                                 <td><i class="icon-download-alt"></i></td>
                                 <td>&nbsp;</td>
                             </tr>
@@ -53,7 +53,7 @@
                             <tr data-bind="event: {mouseover: $root.MainViewModel.enableDelete, mouseout: $root.MainViewModel.disableDelete}">
                                 <td></td>
                                 <td data-bind="text: Filename"></td>
-                                <td data-bind="text: Extension"></td>
+                                <td data-bind="text: MimeType"></td>
                                 <td><a data-bind="attr: { href: 'http://localhost:1109/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }" class="btn btn-small" target="_blank"><i class="icon-download"></i></a></td>
                                 <td><i data-bind="click:$root.MainViewModel.removeFile" class="icon-trash"></i></td>
                             </tr>
