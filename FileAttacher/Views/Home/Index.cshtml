@@ -5,12 +5,34 @@
         padding-right:20px;
         min-height: 200px;
     }
+    .header-cat {
+        margin: 15px 0px 30px;
+    }
+    .icon-file {
+        margin-right: 15px;
+    }
+    #newFolderInput{
+        margin-left:10px;
+        margin-bottom: 0px;
+    }
+    .file-controls {
+        line-height:35px;
+    }
+    #appContent.file-controls {
+        margin-top:10px;
+    }
     .table thead tr {
         margin: 10px 0;
         font-family: inherit;
-        font-weight: bold;
         line-height: 20px;
         color: inherit;
+        text-rendering: optimizelegibility;
+        font-size: 17.5px;
+    }
+    .main-cat {
+        font-family: inherit;
+        line-height: 20px;
+        color: #999;
         text-rendering: optimizelegibility;
         font-size: 17.5px;
     }
@@ -23,19 +45,23 @@
 </style>
 
 <div id="ViewModel">
-    <div id="fixHeight" class="container">
-        <div class="row-fluid">
+    <div class="container">
+        <div class="row-fluid" >
 
-            <div id="careNav" class="span3">
-                <p>STATIC COL SPAN3</p>
+            <div id="careNav" class="span3 fix-height">
+                <!--<p>STATIC COL SPAN3</p>-->
             </div>
 
-            <div id="appContent" class="span9">
-                <span class="span4">discharge notes</span>
-                <span class="offset7">
-                    <button type="button" class="btn btn-default" data-bind="click:ModalViewModel.showModal"><i class="icon-plus-sign"></i></button>
-                </span>
-                <hr />
+            <div id="appContent" class="span9 fix-height">
+                <div class="header-cat">
+                    <span class="span4 main-cat">FILES - DISCHARGE NOTES</span>
+                    <span class="offset4 file-controls">
+                        <i title="New File" data-placement="top" data-bind="click:ModalViewModel.showModal" class="icon-file"></i>
+                        <i title="New Folder" data-placement="top" data-bind="click:$root.MainViewModel.showFolderInput" class="icon-folder-open"></i>
+                        <input type="text" class="input-medium" id="newFolderInput" data-bind="visible:$root.MainViewModel.createNewFolder, value:$root.MainViewModel.newFolderName" />
+                        <i data-bind="visible:$root.MainViewModel.createNewFolder, click:$root.MainViewModel.createFolder" class="icon-plus"></i>
+                    </span>
+                </div>
 
                 <div>
                     <!-- File(s) table-->
@@ -45,7 +71,7 @@
                                 <td>&nbsp;</td>
                                 <td>File Name</td>
                                 <td>Type</td>
-                                <td><i class="icon-download-alt"></i></td>
+                                <td><i title="Download File" data-placement="top" class="icon-download-alt"></i></td>
                                 <td>&nbsp;</td>
                             </tr>
                         </thead>
@@ -55,6 +81,7 @@
                                     <a id="imgBlow" data-bind="attr: { href: 'http://localhost:1109/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }">
                                         <i data-bind="click:$root.MainViewModel.showImage, visible: MimeType == 'image/jpeg'" class="icon-fullscreen"></i>
                                     </a>
+                                    <i data-bind="visible: MimeType == 'folder'" class="icon-folder-close"></i>
                                 </td>
                                 <td data-bind="text: Filename"></td>
                                 <td data-bind="text: MimeType"></td>
@@ -63,7 +90,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    
+
                 </div>
             </div>
         </div>

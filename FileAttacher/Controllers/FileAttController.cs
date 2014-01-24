@@ -18,6 +18,7 @@ namespace FileAttacher.Controllers
         {
             var test = RequestMessage;
         }
+
         [HttpGet, HttpPost]
         public async Task<HttpResponseMessage> GetAll()
         {
@@ -29,6 +30,7 @@ namespace FileAttacher.Controllers
 
             return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value);
         }
+
         [HttpGet, HttpPost]
         public async Task<HttpResponseMessage> RemoveS3File(string f)
         {
@@ -39,6 +41,7 @@ namespace FileAttacher.Controllers
 
             return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value); //result.Value = id removed
         }
+
         //async prop
         [HttpGet, HttpPost]
         public async Task<HttpResponseMessage> SaveUploads(List<FileAtt> files)
@@ -50,6 +53,43 @@ namespace FileAttacher.Controllers
                 return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
 
             return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value);
+        }
+        private async Task<Result> Create(FileAtt f)
+        {
+
+            var result = new Result();
+
+            if (String.IsNullOrEmpty(f.Filename))
+            {
+                result.AddError("File", "Name required for creation");
+                return result;
+            }
+            else // set mime type on save now vs return with S3
+            {
+                f.MimeType = ReturnExtension(f.Extension);
+            }
+
+            using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
+            {
+                await session.StoreAsync(f);
+                await session.SaveChangesAsync();
+
+                result.Value = f.Id;
+            }
+
+            return result;
+        }
+        private async Task<Result> BulkSave(List<FileAtt> fAtts)
+        {
+            var result = new Result();
+
+            foreach (var f in fAtts)
+            {
+                //check
+                await Create(f);
+            }
+
+            return result;
         }
         private async Task<Result<List<FileAtt>>> GetFiles()
         {
@@ -87,43 +127,6 @@ namespace FileAttacher.Controllers
 
             return result;
         } 
-        private async Task<Result> Create(FileAtt f)
-        {
-
-            var result = new Result();
-
-            if (String.IsNullOrEmpty(f.Filename))
-            {
-                result.AddError("File", "Name required for creation");
-                return result;
-            }
-            else // set mime type on save now vs return with S3
-            {
-                f.MimeType = ReturnExtension(f.Extension);
-            }
-
-            using(var session = RavenApiController.DocumentStore.OpenAsyncSession())
-            {
-                await session.StoreAsync(f);
-                await session.SaveChangesAsync();
-
-                result.Value = f.Id;
-            }
-
-            return result;
-        } 
-        private async Task<Result> BulkSave(List<FileAtt> fAtts)
-        {
-            var result = new Result();
-
-            foreach (var f in fAtts)
-            {
-                //check
-                await Create(f);
-            }
-
-            return result;
-        }
 
         private string ReturnExtension(string fileExtension)
         {

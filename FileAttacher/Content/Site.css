@@ -1,5 +1,5 @@
 ﻿body {
-    padding-top: 50px;
+    padding-top: 40px;
     padding-bottom: 20px;
 }
 
@@ -49,10 +49,16 @@ input[type="checkbox"].input-validation-error {
     min-height:500px;
 }
 
-#fixHeight {
+.fix-height {
     min-height: 1000px;
 }
 
 #careNav {
+    min-height: 1000px;
     margin-left:0px;
+    background: #92aab3;
+}
+
+.navbar .brand {
+    margin-left: -10px;
 }

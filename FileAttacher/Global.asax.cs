@@ -90,13 +90,8 @@ namespace FileAttacher
 
         public static void RegisterRoutes(RouteCollection routes)
         {
-            /*
-            routes.MapRoute(
-                name: "Default",
-                url: "",
-                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
-            );
-             */
+            
+            /* File routes */
             routes.MapHttpRoute(
                 name: "GetAllApi",
                 routeTemplate: "api/v1/FileAtt/GetAll",
@@ -113,6 +108,20 @@ namespace FileAttacher
                 name: "RemoveS3FileApi",
                 routeTemplate: "api/v1/FileAtt/RemoveS3File",
                 defaults: new { Controller = "FileAtt", Action = "RemoveS3File", id = RouteParameter.Optional },
+                constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
+                );
+            
+            /* Folder routes */
+            routes.MapHttpRoute(
+                name: "GetRootApi",
+                routeTemplate: "api/v1/Folder/GetRoot",
+                defaults: new { Controller = "Folder", Action = "GetRoot" },
+                constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
+                );
+            routes.MapHttpRoute(
+                name: "SaveFolderApi",
+                routeTemplate: "api/v1/Folder/SaveFolder",
+                defaults: new { Controller = "Folder", Action = "SaveFolder" },
                 constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
                 );
         }
