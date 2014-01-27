@@ -19,6 +19,9 @@ namespace FileAttacher.Controllers
             var test = RequestMessage;
         }
 
+        /******************************************************************************/
+        /***************************       GET       **********************************/
+        /******************************************************************************/
         [HttpGet, HttpPost]
         public async Task<HttpResponseMessage> GetAll()
         {
@@ -30,7 +33,62 @@ namespace FileAttacher.Controllers
 
             return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value);
         }
+        private async Task<Result<List<FileAtt>>> GetFiles()
+        {
 
+            var result = new Result<List<FileAtt>>();
+
+            using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
+            {
+                var files = await session.Query<FileAtt>().Distinct().ToListAsync() as List<FileAtt>;
+                result.Value = files;
+            }
+
+            //check before return?
+            return result;
+        }
+
+        /*
+         * Get Files by Ids 
+         */
+        [HttpGet, HttpPost]
+        public async Task<HttpResponseMessage> GetFilesByIds(List<string> fIds)
+        {
+
+            var result = await GetByIds(fIds);
+
+            if (!result.IsValid)
+                return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
+
+            return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value);
+        }
+        private async Task<Result<List<FileAtt>>> GetByIds(List<string> fAtts)
+        {
+            var result = new Result<List<FileAtt>>();
+
+            using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
+            {
+                foreach (var fId in fAtts)
+                {
+                    var file = await session.LoadAsync<FileAtt>(fId);
+
+                    if (file == null)
+                    {
+                        result.AddError("file", "file not found");
+                    }
+                    else
+                    {
+                        result.Value.Add(file);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        /******************************************************************************/
+        /***************************     REMOVE      **********************************/
+        /******************************************************************************/
         [HttpGet, HttpPost]
         public async Task<HttpResponseMessage> RemoveS3File(string f)
         {
@@ -41,8 +99,32 @@ namespace FileAttacher.Controllers
 
             return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value); //result.Value = id removed
         }
+        private async Task<Result> Remove(string Id)
+        {
 
-        //async prop
+            var result = new Result();
+
+            if (String.IsNullOrEmpty(Id))
+            {
+                result.AddError("File", "Name required for removal");
+                return result;
+            }
+
+            using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
+            {
+                FileAtt existingFile = await session.LoadAsync<FileAtt>(Id);
+                session.Delete(existingFile);
+                await session.SaveChangesAsync();
+
+                result.Value = "success"; // put string here instead with success remove msg?
+            }
+
+            return result;
+        }
+
+        /******************************************************************************/
+        /***************************   CREATE/SAVE   **********************************/
+        /******************************************************************************/
         [HttpGet, HttpPost]
         public async Task<HttpResponseMessage> SaveUploads(List<FileAtt> files)
         {
@@ -91,42 +173,6 @@ namespace FileAttacher.Controllers
 
             return result;
         }
-        private async Task<Result<List<FileAtt>>> GetFiles()
-        {
-
-            var result = new Result<List<FileAtt>>();
-
-            using(var session = RavenApiController.DocumentStore.OpenAsyncSession())
-            {
-                var files = await session.Query<FileAtt>().Distinct().ToListAsync() as List<FileAtt>;
-                result.Value = files;
-            }
-
-            //check before return?
-            return result;
-        }
-        private async Task<Result> Remove(string Id)
-        {
-
-            var result = new Result();
-
-            if (String.IsNullOrEmpty(Id))
-            {
-                result.AddError("File", "Name required for removal");
-                return result;
-            }
-
-            using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
-            {
-                FileAtt existingFile = await session.LoadAsync<FileAtt>(Id);
-                session.Delete(existingFile);
-                await session.SaveChangesAsync();
-
-                result.Value = "success"; // put string here instead with success remove msg?
-            }
-
-            return result;
-        } 
 
         private string ReturnExtension(string fileExtension)
         {

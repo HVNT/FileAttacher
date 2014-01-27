@@ -93,7 +93,7 @@ function ModalViewModel() {
             contentType: "application/json",
             dataType: "json",
             url: "/api/v1/FileAtt/SaveUploads",
-            data: JSON.stringify(fArr),
+            data: JSON.stringify({ files: fArr, id: self.currFolderId}),
             success: function (data) {
                 location.reload();
             },

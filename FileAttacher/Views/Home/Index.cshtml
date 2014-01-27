@@ -78,15 +78,16 @@
                         <tbody data-bind="foreach: MainViewModel.files">
                             <tr>
                                 <td>
-                                    <a id="imgBlow" data-bind="attr: { href: 'http://localhost:1109/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }">
+                                    <a id="imgBlow" data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }">
                                         <i data-bind="click:$root.MainViewModel.showImage, visible: MimeType == 'image/jpeg'" class="icon-fullscreen"></i>
                                     </a>
                                     <i data-bind="visible: MimeType == 'folder'" class="icon-folder-close"></i>
                                 </td>
                                 <td data-bind="text: Filename"></td>
                                 <td data-bind="text: MimeType"></td>
-                                <td><a data-bind="attr: { href: 'http://localhost:1109/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }" class="btn btn-small" target="_blank"><i class="icon-download"></i></a></td>
+                                <td><a data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }" class="btn btn-small" target="_blank"><i class="icon-download"></i></a></td>
                                 <td><i data-bind="click:$root.MainViewModel.removeFile" class="icon-trash"></i></td>
+                            
                             </tr>
                         </tbody>
                     </table>

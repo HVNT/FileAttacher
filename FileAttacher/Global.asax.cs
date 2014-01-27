@@ -92,12 +92,18 @@ namespace FileAttacher
         {
             
             /* File routes */
-            routes.MapHttpRoute(
+            /*routes.MapHttpRoute(
                 name: "GetAllApi",
                 routeTemplate: "api/v1/FileAtt/GetAll",
                 defaults: new { Controller = "FileAtt", Action = "GetAll" },
                 constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
-                );
+                );*/
+            /*routes.MapHttpRoute(
+                name: "GetFilesByIdsApi",
+                routeTemplate: "api/v1/FileAtt/GetFilesByIds",
+                defaults: new { Controller = "FileAtt", Action = "GetFilesByIds", id = RouteParameter.Optional},
+                constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
+                );*/
             routes.MapHttpRoute(
                 name: "SaveUploadsApi",
                 routeTemplate: "api/v1/FileAtt/SaveUploads",
@@ -112,16 +118,22 @@ namespace FileAttacher
                 );
             
             /* Folder routes */
-            routes.MapHttpRoute(
+            /*routes.MapHttpRoute(
                 name: "GetRootApi",
                 routeTemplate: "api/v1/Folder/GetRoot",
                 defaults: new { Controller = "Folder", Action = "GetRoot" },
                 constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
-                );
+                );*/
             routes.MapHttpRoute(
                 name: "SaveFolderApi",
                 routeTemplate: "api/v1/Folder/SaveFolder",
                 defaults: new { Controller = "Folder", Action = "SaveFolder" },
+                constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
+                );
+            routes.MapHttpRoute(
+                name: "GetFolderApi",
+                routeTemplate: "api/v1/Folder/GetFolder",
+                defaults: new { Controller = "Folder", Action = "GetFolder", id = RouteParameter.Optional },
                 constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
                 );
         }

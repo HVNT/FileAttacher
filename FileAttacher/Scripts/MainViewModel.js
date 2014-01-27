@@ -1,48 +1,29 @@
 ﻿function MainViewModel() {
 
-    var self = this;
-    self.files = ko.observableArray();
-    self.createNewFolder = ko.observable(false);
-    self.newFolderName = ko.observable("");
-
-    /* For making trash can appear on hover
-    self.deleteEnabled = ko.observable(false);
-    self.enableDelete = function () {
-        self.deleteEnabled(true);
-    }
-    self.disableDelete = function () {
-        self.deleteEnabled(false);
-    }
-    */
+    var self = this; // view model
+    self.currFolderId = ko.observable(""); // current folder id - set to root on load
+    self.files = ko.observableArray(); // container for current folder
+    self.createNewFolder = ko.observable(false); // show new folder input field?
+    self.newFolderName = ko.observable(""); // new folder input field text
+    
+    //ON page load
     $.ajax({
         type: "GET",
         contentType: "application/json",
         dataType: "json",
-        url: "/api/v1/FileAtt/GetAll",
+        url: "/api/v1/Folder/GetFolder", // ?id=" + "root", //root
         success: function (data) {
             console.log(data);
-            self.files(data);
+            self.currFolderId = data.Id;
         },
         error: function (data) {
             console.log(data);
         }
     });
 
-    $.ajax({
-        type: "GET",
-        contentType: "application/json",
-        dataType: "json",
-        url: "/api/v1/Folder/GetRoot",
-        success: function (data) {
-            console.log(data);
-            self.files(data);
-        },
-        error: function (data) {
-            console.log(data);
-        }
-    });
-
-
+    /*
+     * Remove File on action trash can icon click
+     */
     self.removeFile = function (file) {
         var f = file;
 
@@ -61,13 +42,18 @@
         });
     }
 
+    /*
+     * Show image preview on modal on full screen icon click
+     */
     self.showImage = function () {
-
         $("a#imgBlow").fancybox({
             'type': 'image'
         });
     }
 
+    /*
+     * New Folder input field toggle
+     */
     self.showFolderInput = function () {
         if (self.createNewFolder()) {
             self.createNewFolder(false);
@@ -77,16 +63,21 @@
         }
     }
 
+    /*
+     * Save new folder on action click '+' icon
+     * Constraint: Folder name cannot be empty || ''
+     */
     self.createFolder = function () {
 
         if (!self.newFolderName()) {
             console.log("Folder name cannot be empty.");
         } else {
             var folder = {
+                ParentFolderId: "",
                 Filename: self.newFolderName(),
                 MimeType: "folder",
-                FileAtts: [],
-                Folders: []
+                FileAttsIds: [],
+                FoldersIds: []
             }
             $.ajax({
                 type: "POST",
