@@ -59,17 +59,17 @@ namespace FileAttacher.Controllers
         /***************************   CREATE/SAVE   **********************************/
         /******************************************************************************/
         [HttpGet, HttpPost]
-        public async Task<HttpResponseMessage> SaveUploads(List<FileAtt> files)
+        public async Task<HttpResponseMessage> SaveUploads(string fID, List<FileAtt> files)
         {
 
-            var result = await BulkSave(files);
+            var result = await BulkSave(files, fID);
 
             if (!result.IsValid)
                 return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
 
             return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value);
         }
-        private async Task<Result> Create(FileAtt f)
+        private async Task<Result> Create(FileAtt f, string folderId)
         {
 
             var result = new Result();
@@ -87,6 +87,11 @@ namespace FileAttacher.Controllers
             using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
             {
                 await session.StoreAsync(f);
+
+                //store in root folder
+                var rootFolder = await session.LoadAsync<Folder>(folderId); //location of root
+                rootFolder.FileAttsIds.Add(f.Id);
+
                 await session.SaveChangesAsync();
 
                 result.Value = f.Id;
@@ -94,14 +99,14 @@ namespace FileAttacher.Controllers
 
             return result;
         }
-        private async Task<Result> BulkSave(List<FileAtt> fAtts)
+        private async Task<Result> BulkSave(List<FileAtt> fAtts, string folderId)
         {
             var result = new Result();
 
             foreach (var f in fAtts)
             {
                 //check
-                await Create(f);
+                await Create(f, folderId);
             }
 
             return result;

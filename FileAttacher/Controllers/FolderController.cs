@@ -25,7 +25,7 @@ namespace FileAttacher.Controllers
         [HttpGet, HttpPost]
         public async Task<HttpResponseMessage> GetFolder(string id)
         {
-            if (id == "root") // ... || "" ??
+            if (id == null) // ... || "" ??
             {
                 var result = await GetRootFolder();
 
@@ -52,18 +52,24 @@ namespace FileAttacher.Controllers
             using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
             {
                 var rootFolder = await session.LoadAsync<Folder>("folders/33"); //location of root
-                foreach (var id in rootFolder.FileAttsIds)
+                if (rootFolder.FileAttsIds.Count > 0)
                 {
-                    // load each id and add to fileatts
-                    var file = await session.LoadAsync<FileAtt>(id); // get file
-                    rootFolder.FileAtts.Add(file); // add file
+                    foreach (var id in rootFolder.FileAttsIds)
+                    {
+                        // load each id and add to fileatts
+                        var file = await session.LoadAsync<FileAtt>(id); // get file
+                        rootFolder.FileAtts.Add(file); // add file
+                    }
                 }
-                foreach (var id in rootFolder.FoldersIds)
+                if (rootFolder.FoldersIds.Count > 0)
                 {
-                    var folder = await session.LoadAsync<Folder>(id); // get folder
-                    rootFolder.Folders.Add(folder); // add folder
+                    foreach (var id in rootFolder.FoldersIds)
+                    {
+                        var folder = await session.LoadAsync<Folder>(id); // get folder
+                        rootFolder.Folders.Add(folder); // add folder
+                    }
                 }
-                /*
+                
                 if (rootFolder == null)
                 {
                     result.AddError("root", "root Folder not found");
@@ -72,39 +78,42 @@ namespace FileAttacher.Controllers
                 {
                     result.Value = rootFolder;
                 }
-                 */
             }
 
             return result;
         }
-        private async Task<Result<Folder>> GetFolderById(string id) {
+        private async Task<Result<Folder>> GetFolderById(string fId) {
 
             var result = new Result<Folder>();
 
             using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
             {
-                var folder = await session.LoadAsync<Folder>(id); // folder @ id
-                foreach (var i in folder.FileAttsIds)
+                var rootFolder = await session.LoadAsync<Folder>(fId); //get folder
+                if (rootFolder.FileAttsIds.Count > 0)
                 {
-                    var file = await session.LoadAsync<FileAtt>(i); // get file
-                    folder.FileAtts.Add(file); // add file
+                    foreach (var id in rootFolder.FileAttsIds)
+                    {
+                        // load each id and add to fileatts
+                        var file = await session.LoadAsync<FileAtt>(id); // get file
+                        rootFolder.FileAtts.Add(file); // add file
+                    }
                 }
-                foreach (var i in folder.FoldersIds)
+                if (rootFolder.FoldersIds.Count > 0)
                 {
-                    var _folder = await session.LoadAsync<Folder>(i); // get folder
-                    folder.Folders.Add(_folder); // add folder
+                    foreach (var id in rootFolder.FoldersIds)
+                    {
+                        var folder = await session.LoadAsync<Folder>(id); // get folder
+                        rootFolder.Folders.Add(folder); // add folder
+                    }
                 }
-
-                /*
-                if (folder == null)
+                if (rootFolder == null)
                 {
                     result.AddError("root", "root Folder not found");
                 }
                 else
                 {
-                    result.Value = folder;
+                    result.Value = rootFolder;
                 }
-                 */
             }
 
             return result;
@@ -116,17 +125,17 @@ namespace FileAttacher.Controllers
         /***************************   CREATE/SAVE   **********************************/
         /******************************************************************************/
         [HttpGet, HttpPost]
-        public async Task<HttpResponseMessage> SaveFolder(Folder f)
+        public async Task<HttpResponseMessage> SaveFolder(string fID, Folder f)
         {
 
-            var result = await Create(f);
+            var result = await Create(fID, f);
 
             if (!result.IsValid)
                 return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
 
             return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value);
         }
-        private async Task<Result> Create(Folder f)
+        private async Task<Result> Create(string folderID, Folder f)
         {
 
             var result = new Result();
@@ -140,6 +149,10 @@ namespace FileAttacher.Controllers
             using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
             {
                 await session.StoreAsync(f);
+
+                var rootFolder = await session.LoadAsync<Folder>(folderID); //location of root
+                rootFolder.FoldersIds.Add(f.Id);
+
                 await session.SaveChangesAsync();
 
                 result.Value = f.Id;

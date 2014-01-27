@@ -8,6 +8,11 @@ namespace FileAttacher.Models
 {
     public class Folder : DomainModel
     {
+        public Folder()
+        {
+            FileAtts = new List<FileAtt>();
+            Folders = new List<Folder>();
+        }
         public string ParentFolderId { get; set; } //?
         //public string Key { get; set; } // prop for S3.. nolonger needded
         public string MimeType { get; set; }

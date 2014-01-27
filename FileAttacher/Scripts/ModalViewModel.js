@@ -2,6 +2,7 @@
 function ModalViewModel() {
     
     var self = this;
+    self.currFolderId = ko.observable("");
 
     ko.bindingHandlers.bootstrapModal = {
         init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
@@ -50,7 +51,10 @@ function ModalViewModel() {
 
     self.fileAttachs = [];
 
-    self.showModal = function () {
+    self.showModal = function (root) {
+        //h4ck to set currFolderId from MainViewModel
+        console.log(root);
+        self.currFolderId(root.MainViewModel.currFolderId());
 
         self.modal.show(true);
         /* Bind FineUploader to modal view */
@@ -86,14 +90,16 @@ function ModalViewModel() {
 
     self.onModalAction = function () {
         console.log(self.fileAttachs);
+        console.log(self.currFolderId());
         var fArr = self.fileAttachs;
-
+        var fID = self.currFolderId();
+        
         $.ajax({
             type: "POST",
             contentType: "application/json",
             dataType: "json",
-            url: "/api/v1/FileAtt/SaveUploads",
-            data: JSON.stringify({ files: fArr, id: self.currFolderId}),
+            url: "/api/v1/FileAtt/SaveUploads?fID=" + fID, //?
+            data: JSON.stringify(fArr),
             success: function (data) {
                 location.reload();
             },

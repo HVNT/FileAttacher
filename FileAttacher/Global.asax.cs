@@ -73,7 +73,7 @@ namespace FileAttacher
             routes.MapHttpRoute(
                 name: "SaveUploadsApi",
                 routeTemplate: "api/v1/FileAtt/SaveUploads",
-                defaults: new { Controller = "FileAtt", Action = "SaveUploads" },
+                defaults: new { Controller = "FileAtt", Action = "SaveUploads", id = RouteParameter.Optional },
                 constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
                 );
             routes.MapHttpRoute(
