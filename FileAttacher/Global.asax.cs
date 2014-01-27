@@ -49,28 +49,6 @@ namespace FileAttacher
             RavenApiController.DocumentStore = Store;
         }
 
-        /*
-        private static void RavenDBInit()
-        {
-            var parser = ConnectionStringParser<RavenConnectionStringOptions>.FromConnectionStringName("RavenDB");
-            parser.Parse();
-
-            Store = new DocumentStore
-            {
-                ApiKey = parser.ConnectionStringOptions.ApiKey,
-                Url = parser.ConnectionStringOptions.Url,
-            };
-
-            Store.Initialize();
-
-
-            IndexCreation.CreateIndexes(Assembly.GetCallingAssembly(), Store);
-
-            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-            Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
-        }
-        */
-
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
             filters.Add(new HandleErrorAttribute());
@@ -92,18 +70,6 @@ namespace FileAttacher
         {
             
             /* File routes */
-            /*routes.MapHttpRoute(
-                name: "GetAllApi",
-                routeTemplate: "api/v1/FileAtt/GetAll",
-                defaults: new { Controller = "FileAtt", Action = "GetAll" },
-                constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
-                );*/
-            /*routes.MapHttpRoute(
-                name: "GetFilesByIdsApi",
-                routeTemplate: "api/v1/FileAtt/GetFilesByIds",
-                defaults: new { Controller = "FileAtt", Action = "GetFilesByIds", id = RouteParameter.Optional},
-                constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
-                );*/
             routes.MapHttpRoute(
                 name: "SaveUploadsApi",
                 routeTemplate: "api/v1/FileAtt/SaveUploads",
@@ -118,12 +84,6 @@ namespace FileAttacher
                 );
             
             /* Folder routes */
-            /*routes.MapHttpRoute(
-                name: "GetRootApi",
-                routeTemplate: "api/v1/Folder/GetRoot",
-                defaults: new { Controller = "Folder", Action = "GetRoot" },
-                constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
-                );*/
             routes.MapHttpRoute(
                 name: "SaveFolderApi",
                 routeTemplate: "api/v1/Folder/SaveFolder",
