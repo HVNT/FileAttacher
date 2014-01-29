@@ -6,27 +6,28 @@
     self.folders = ko.observableArray(); // container for current folder
     self.createNewFolder = ko.observable(false); // show new folder input field?
     self.newFolderName = ko.observable(""); // new folder input field text
+
+    //?
     self.folderNav = ko.observableArray(); // for nested folder nav, when empty at root
 
-    //self.showOpen = ko.observable(false); open folder icon v closed on hover
-
+    var careCenterID = "Center/99"; // HARDCODED Care CenterID
 
     //ON page load
     $.ajax({
         type: "GET",
         contentType: "application/json",
         dataType: "json",
-        url: "/api/v1/Folder/GetFolder?id=" + self.currFolderId(), //root
+        url: "/api/v1/Folder/GetFolder?cID=" + careCenterID, //root
         success: function (data) {
 
             console.log(data);
             
-            self.currFolderId(data.Id);
+            self.currFolderId(data.g);
             self.files(data.FileAtts);
             self.folders(data.Folders);
 
             // push to current folderNav
-            self.folderNav.push(data.Id);
+            //self.folderNav.push(data.Id);
         },
         error: function (data) {
             console.log(data);
@@ -43,10 +44,11 @@
             type: "POST",
             contentType: "application/json",
             dataType: "json",
-            url: "/api/v1/FileAtt/RemoveS3File?f=" + f.Id,
+            url: "/api/v1/FileAtt/RemoveFile",
+            data: JSON.stringify({cID: careCenterID, fileID: f.g}), // file guid
             success: function (data) {
                 console.log(data);
-                //location.reload();
+
             },
             error: function (data) {
                 console.log(data);
@@ -88,18 +90,17 @@
             console.log("Folder name cannot be empty.");
         } else {
             var folder = {
-                ParentFolderId: "",
                 Filename: self.newFolderName(),
                 MimeType: "folder",
-                FileAttsIds: [],
-                FoldersIds: []
+                FileAtts: [],
+                Folders: []
             }
             $.ajax({
                 type: "POST",
                 contentType: "application/json",
                 dataType: "json",
-                url: "/api/v1/Folder/SaveFolder?fID=" + fID,
-                data: JSON.stringify(folder),
+                url: "/api/v1/Folder/SaveFolder",
+                data: JSON.stringify({ cID: careCenterID, folderID: fID, f: folder}),
                 success: function (data) {
                     console.log(data);
                     self.folders(data);
@@ -126,8 +127,10 @@
     }
 
     self.openFolder = function (Id) {
-        self.currFolderId(Id);
-
+        //self.currFolderId(Id);
+        console.log(Id);
+        //just open folder..
+        /*
         $.ajax({
             type: "GET",
             contentType: "application/json",
@@ -146,7 +149,7 @@
                 console.log(data);
             }
         });
-
+        */
     }
 
     self.removeFolder = function (folder) {

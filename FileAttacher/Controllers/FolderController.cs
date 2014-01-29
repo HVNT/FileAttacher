@@ -21,9 +21,9 @@ namespace FileAttacher.Controllers
 
         #region GET
         [HttpGet, HttpPost]
-        public async Task<HttpResponseMessage> GetFolder(string centerID)
+        public async Task<HttpResponseMessage> GetFolder(string cID)
         {
-            var result = await GetRootFolder(centerID);
+            var result = await GetRootFolder(cID);
 
             if (!result.IsValid)
                 return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
@@ -54,21 +54,18 @@ namespace FileAttacher.Controllers
         #endregion
 
         #region CREATE/SAVE
-        /******************************************************************************/
-        /***************************   CREATE/SAVE   **********************************/
-        /******************************************************************************/
         [HttpGet, HttpPost]
-        public async Task<HttpResponseMessage> SaveFolder(string fID, Folder f)
+        public async Task<HttpResponseMessage> SaveFolder(string cID, Guid folderID, Folder f)
         {
 
-            var result = await Create(fID, f);
+            var result = await Create(cID, folderID, f);
 
             if (!result.IsValid)
                 return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
 
             return RequestMessage.CreateResponse(HttpStatusCode.OK, f);
         }
-        private async Task<Result> Create(string folderID, Folder f)
+        private async Task<Result> Create(string centerID, Guid folderID, Folder f)
         {
 
             var result = new Result();
@@ -81,14 +78,55 @@ namespace FileAttacher.Controllers
 
             using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
             {
-                await session.StoreAsync(f);
+                Folder targetFolder = null;
+                Boolean found = false;
 
-                var rootFolder = await session.LoadAsync<Folder>(folderID); //location of root
-                rootFolder.Folders.Add(f);
+                // delete file from folder
+                Center careCenter = await session.LoadAsync<Center>(centerID); // load care center given ID
 
-                await session.SaveChangesAsync();
+                Folder temp = careCenter.RootFolder;
+                Queue<Folder> q = new Queue<Folder>(); // dfs
+                q.Enqueue(temp); // put root on top
 
-                //result.Value = f.Id;
+                while (q.Count > 0) // while folders remain
+                {
+                    Folder current = q.Dequeue();
+
+                    foreach (var folder in current.Folders)
+                    {
+                        if (folder.g == folderID) // folder found!
+                        {
+                            targetFolder = folder; // get folder ref
+                            found = true; // set found to true for while break
+                            break; // break foreach if found
+                        }
+                    }
+                    if (found)
+                    {
+                        break; // if found break while loop
+                    }
+                    else // !found
+                    {
+                        foreach (var folder in current.Folders) // add all current avail folders to queue
+                        {
+                            q.Enqueue(folder);
+                        }
+                    }
+                }
+
+                if (targetFolder == null) // shit
+                {
+                    result.AddError("No Folder found to add to", "under that guid uhoh.");
+                    return result;
+                }
+                else // all good, folder to add the file too was found
+                {
+                    // add file to targetFolder
+                    targetFolder.Folders.Add(f);
+                    await session.SaveChangesAsync();
+
+                    result.Value = "successful add of folder to folder w/ guidID" + folderID;
+                }
             }
 
             return result;

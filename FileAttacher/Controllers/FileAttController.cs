@@ -21,9 +21,9 @@ namespace FileAttacher.Controllers
 
         #region Remove
         [HttpGet, HttpPost]
-        public async Task<HttpResponseMessage> RemoveFile(string centerID, Guid fileID)
+        public async Task<HttpResponseMessage> RemoveFile(string cID, Guid fileID)
         {
-            var result = await Remove(centerID, fileID);
+            var result = await Remove(cID, fileID);
 
             if(!result.IsValid)
                 return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
@@ -99,10 +99,10 @@ namespace FileAttacher.Controllers
 
         #region Create/Save
         [HttpGet, HttpPost]
-        public async Task<HttpResponseMessage> SaveUploads(string centerID, Guid folderID, List<FileAtt> files)
+        public async Task<HttpResponseMessage> SaveUploads(string cID, Guid folderID, List<FileAtt> files)
         {
 
-            var result = await BulkSave(centerID, folderID, files);
+            var result = await BulkSave(cID, folderID, files);
 
             if (!result.IsValid)
                 return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
@@ -137,9 +137,7 @@ namespace FileAttacher.Controllers
             }
 
             using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
-            {
-                await session.StoreAsync(f);
-                
+            {                
                 Folder targetFolder = null;
                 Boolean found = false;
 
@@ -147,7 +145,23 @@ namespace FileAttacher.Controllers
                 Center careCenter = await session.LoadAsync<Center>(centerID); // load care center given ID
                 
                 Folder temp = careCenter.RootFolder;
-                Queue<Folder> q = new Queue<Folder>(); // dfs
+                
+                // quick check to see if at root since this is most likely use case
+                if (temp.g == folderId)
+                {
+                    targetFolder = temp; // set to target
+
+                    targetFolder.FileAtts.Add(f); // add to target
+                    await session.SaveChangesAsync();
+
+                    result.Value = "successful add of file to folder w/ guidID" + folderId;
+
+                    return result;
+                }
+
+                // else not at root lvl and begin bfs
+
+                Queue<Folder> q = new Queue<Folder>(); // bfs queue
                 q.Enqueue(temp); // put root on top
 
                 while (q.Count > 0) // while folders remain

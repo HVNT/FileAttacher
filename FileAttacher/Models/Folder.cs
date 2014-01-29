@@ -15,14 +15,9 @@ namespace FileAttacher.Models
             g = Guid.NewGuid();
         }
         public Guid g { get; set;}
-        public string ParentFolderId { get; set; } //?
-        //public string Key { get; set; } // prop for S3.. nolonger needded
         public string MimeType { get; set; }
         public string Filename { get; set; } // change to Foldername??
-        //public string Extension { get; set; } // none for folder for proto
         public List<FileAtt> FileAtts { get; set; }
-        //public List<string> FileAttsIds { get; set; }
         public List<Folder> Folders { get; set; }
-        //public List<string> FoldersIds { get; set; }
     }
 }

@@ -73,13 +73,13 @@ namespace FileAttacher
             routes.MapHttpRoute(
                 name: "SaveUploadsApi",
                 routeTemplate: "api/v1/FileAtt/SaveUploads",
-                defaults: new { Controller = "FileAtt", Action = "SaveUploads", id = RouteParameter.Optional },
+                defaults: new { Controller = "FileAtt", Action = "SaveUploads" },
                 constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
                 );
             routes.MapHttpRoute(
-                name: "RemoveS3FileApi",
-                routeTemplate: "api/v1/FileAtt/RemoveS3File",
-                defaults: new { Controller = "FileAtt", Action = "RemoveS3File", id = RouteParameter.Optional },
+                name: "RemoveFileApi",
+                routeTemplate: "api/v1/FileAtt/RemoveFile",
+                defaults: new { Controller = "FileAtt", Action = "RemoveFile", id = RouteParameter.Optional },
                 constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
                 );
             

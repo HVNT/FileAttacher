@@ -4,6 +4,8 @@ function ModalViewModel() {
     var self = this;
     self.currFolderId = ko.observable("");
 
+    var careCenterID = "Center/99"; // HARDCODED Care CenterID
+
     ko.bindingHandlers.bootstrapModal = {
         init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
             var props = valueAccessor(),
@@ -98,10 +100,10 @@ function ModalViewModel() {
             type: "POST",
             contentType: "application/json",
             dataType: "json",
-            url: "/api/v1/FileAtt/SaveUploads?fID=" + fID, //?
-            data: JSON.stringify(fArr),
+            url: "/api/v1/FileAtt/SaveUploads",
+            data: JSON.stringify({ cID: careCenterID, folderID: fID, files: fArr }), // file guid
             success: function (data) {
-                location.reload();
+                console.log(data);
             },
             error: function (data) {
                 console.log(data);
