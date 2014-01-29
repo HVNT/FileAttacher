@@ -25,24 +25,12 @@ namespace FileAttacher.Controllers
         [HttpGet, HttpPost]
         public async Task<HttpResponseMessage> GetFolder(string id)
         {
-            if (id == null) // ... || "" ??
-            {
-                var result = await GetRootFolder();
+            var result = await GetRootFolder();
 
-                if (!result.IsValid)
-                    return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
+            if (!result.IsValid)
+                return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
 
-                return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value);
-            }
-            else
-            {
-                var result = await GetFolderById(id);
-
-                if (!result.IsValid)
-                    return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
-
-                return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value);
-            }
+            return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value);
         }
         private async Task<Result<Folder>> GetRootFolder()
         {
@@ -52,60 +40,7 @@ namespace FileAttacher.Controllers
             using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
             {
                 var rootFolder = await session.LoadAsync<Folder>("folders/33"); //location of root
-                if (rootFolder.FileAttsIds.Count > 0)
-                {
-                    foreach (var id in rootFolder.FileAttsIds)
-                    {
-                        // load each id and add to fileatts
-                        var file = await session.LoadAsync<FileAtt>(id); // get file
-                        rootFolder.FileAtts.Add(file); // add file
-                    }
-                }
-                if (rootFolder.FoldersIds.Count > 0)
-                {
-                    foreach (var id in rootFolder.FoldersIds)
-                    {
-                        var folder = await session.LoadAsync<Folder>(id); // get folder
-                        rootFolder.Folders.Add(folder); // add folder
-                    }
-                }
-                
-                if (rootFolder == null)
-                {
-                    result.AddError("root", "root Folder not found");
-                }
-                else
-                {
-                    result.Value = rootFolder;
-                }
-            }
-
-            return result;
-        }
-        private async Task<Result<Folder>> GetFolderById(string fId) {
-
-            var result = new Result<Folder>();
-
-            using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
-            {
-                var rootFolder = await session.LoadAsync<Folder>(fId); //get folder
-                if (rootFolder.FileAttsIds.Count > 0)
-                {
-                    foreach (var id in rootFolder.FileAttsIds)
-                    {
-                        // load each id and add to fileatts
-                        var file = await session.LoadAsync<FileAtt>(id); // get file
-                        rootFolder.FileAtts.Add(file); // add file
-                    }
-                }
-                if (rootFolder.FoldersIds.Count > 0)
-                {
-                    foreach (var id in rootFolder.FoldersIds)
-                    {
-                        var folder = await session.LoadAsync<Folder>(id); // get folder
-                        rootFolder.Folders.Add(folder); // add folder
-                    }
-                }
+               
                 if (rootFolder == null)
                 {
                     result.AddError("root", "root Folder not found");
@@ -151,7 +86,7 @@ namespace FileAttacher.Controllers
                 await session.StoreAsync(f);
 
                 var rootFolder = await session.LoadAsync<Folder>(folderID); //location of root
-                rootFolder.FoldersIds.Add(f.Id);
+                rootFolder.Folders.Add(f);
 
                 await session.SaveChangesAsync();
 

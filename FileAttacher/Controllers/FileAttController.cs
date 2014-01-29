@@ -23,40 +23,76 @@ namespace FileAttacher.Controllers
         /***************************     REMOVE      **********************************/
         /******************************************************************************/
         [HttpGet, HttpPost]
-        public async Task<HttpResponseMessage> RemoveS3File(string f)
+        public async Task<HttpResponseMessage> RemoveFile(string centerID, Guid fileID)
         {
-            var result = await Remove(f);
+            var result = await Remove(centerID, fileID);
 
             if(!result.IsValid)
                 return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
 
             return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value); //result.Value = id removed
         }
-        private async Task<Result> Remove(string Id)
+        private async Task<Result> Remove(string centerID, Guid fileID)
         {
 
             var result = new Result();
 
-            if (String.IsNullOrEmpty(Id))
+            if (String.IsNullOrEmpty(centerID))
             {
-                result.AddError("File", "Name required for removal");
+                result.AddError("No centerID", "centerID required for removal");
                 return result;
             }
 
             using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
             {
+                FileAtt f = null;
+                Boolean found = false;
+
                 // delete file from folder
+                Center careCenter = await session.LoadAsync<Center>(centerID); // load care center given ID
                 
+                Folder temp = careCenter.RootFolder;
+                Queue<Folder> q = new Queue<Folder>(); // dfs
+                q.Enqueue(temp); // put root on top
 
-                FileAtt existingFile = await session.LoadAsync<FileAtt>(Id); // delete file Att
-                session.Delete(existingFile);
+                while (q.Count > 0) // while folders remain
+                {
+                    Folder current = q.Dequeue();
 
-                List<Folder> containingFolder = await session.Query<Folder>().Where(x => x.FileAttsIds.Contains(Id)).Take(1).ToListAsync() as List<Folder>;
-                session.Delete(containingFolder[0].FileAttsIds[containingFolder[0].FileAttsIds.IndexOf(Id)]);
+                    foreach (var file in current.FileAtts)
+                    {
+                        if (file.g == fileID) // file found!
+                        {
+                            f = file; // get file ref
+                            found = true; // set found to true for while break
+                            break; // break foreach if found
+                        }
+                    }
+                    if(found) 
+                    {
+                        break; // if found break while loop
+                    }
+                    else // !found
+                    {
+                        foreach (var folder in current.Folders) // add all current avail folders to queue
+                        {
+                            q.Enqueue(folder);
+                        }
+                    }
+                }
 
-                await session.SaveChangesAsync();
+                if (f == null) // shit
+                {
+                    result.AddError("No File found", "under that guid uhoh.");
+                    return result;
+                }
+                else // all good, file was found
+                {
+                    session.Delete(f);
+                    await session.SaveChangesAsync();
 
-                result.Value = "success"; // put string here instead with success remove msg?
+                    result.Value = "successful remove of file w/ guidID" + fileID;
+                }
             }
 
             return result;
@@ -66,17 +102,29 @@ namespace FileAttacher.Controllers
         /***************************   CREATE/SAVE   **********************************/
         /******************************************************************************/
         [HttpGet, HttpPost]
-        public async Task<HttpResponseMessage> SaveUploads(string fID, List<FileAtt> files)
+        public async Task<HttpResponseMessage> SaveUploads(string centerID, Guid folderID, List<FileAtt> files)
         {
 
-            var result = await BulkSave(files, fID);
+            var result = await BulkSave(centerID, folderID, files);
 
             if (!result.IsValid)
                 return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
 
             return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value);
         }
-        private async Task<Result> Create(FileAtt f, string folderId)
+        private async Task<Result> BulkSave(string centerID, Guid folderId, List<FileAtt> fAtts)
+        {
+            var result = new Result();
+
+            foreach (var f in fAtts)
+            {
+                //check
+                await Create(centerID, folderId, f);
+            }
+
+            return result;
+        }
+        private async Task<Result> Create(string centerID, Guid folderId, FileAtt f)
         {
 
             var result = new Result();
@@ -94,26 +142,56 @@ namespace FileAttacher.Controllers
             using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
             {
                 await session.StoreAsync(f);
+                
+                Folder targetFolder = null;
+                Boolean found = false;
 
-                //store in root folder
-                var rootFolder = await session.LoadAsync<Folder>(folderId); //location of root
-                rootFolder.FileAttsIds.Add(f.Id);
+                // delete file from folder
+                Center careCenter = await session.LoadAsync<Center>(centerID); // load care center given ID
+                
+                Folder temp = careCenter.RootFolder;
+                Queue<Folder> q = new Queue<Folder>(); // dfs
+                q.Enqueue(temp); // put root on top
 
-                await session.SaveChangesAsync();
+                while (q.Count > 0) // while folders remain
+                {
+                    Folder current = q.Dequeue();
 
-                result.Value = f.Id;
-            }
+                    foreach (var folder in current.Folders)
+                    {
+                        if (folder.g == folderId) // folder found!
+                        {
+                            targetFolder = folder; // get folder ref
+                            found = true; // set found to true for while break
+                            break; // break foreach if found
+                        }
+                    }
+                    if(found) 
+                    {
+                        break; // if found break while loop
+                    }
+                    else // !found
+                    {
+                        foreach (var folder in current.Folders) // add all current avail folders to queue
+                        {
+                            q.Enqueue(folder);
+                        }
+                    }
+                }
 
-            return result;
-        }
-        private async Task<Result> BulkSave(List<FileAtt> fAtts, string folderId)
-        {
-            var result = new Result();
+                if (targetFolder == null) // shit
+                {
+                    result.AddError("No Folder found to add to", "under that guid uhoh.");
+                    return result;
+                }
+                else // all good, folder to add the file too was found
+                {
+                    // add file to targetFolder
+                    targetFolder.FileAtts.Add(f);
+                    await session.SaveChangesAsync();
 
-            foreach (var f in fAtts)
-            {
-                //check
-                await Create(f, folderId);
+                    result.Value = "successful add of file to folder w/ guidID" + folderId;
+                }
             }
 
             return result;

@@ -6,8 +6,13 @@ using System.Threading.Tasks;
 
 namespace FileAttacher.Models
 {
-    public class FileAtt : DomainModel
+    public class FileAtt
     {
+        public FileAtt()
+        {
+            g = Guid.NewGuid();
+        }
+        public Guid g { get; set; }
         public string Key { get; set; }
         public string MimeType { get; set; }
         public string Filename { get; set; }
