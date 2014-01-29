@@ -19,43 +19,41 @@ namespace FileAttacher.Controllers
             var test = RequestMessage;
         }
 
-        /******************************************************************************/
-        /***************************       GET       **********************************/
-        /******************************************************************************/
+        #region GET
         [HttpGet, HttpPost]
-        public async Task<HttpResponseMessage> GetFolder(string id)
+        public async Task<HttpResponseMessage> GetFolder(string centerID)
         {
-            var result = await GetRootFolder();
+            var result = await GetRootFolder(centerID);
 
             if (!result.IsValid)
                 return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
 
             return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value);
         }
-        private async Task<Result<Folder>> GetRootFolder()
+        private async Task<Result<Folder>> GetRootFolder(string centerID)
         {
 
             var result = new Result<Folder>();
 
             using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
             {
-                var rootFolder = await session.LoadAsync<Folder>("folders/33"); //location of root
-               
-                if (rootFolder == null)
+                Center careCenter = await session.LoadAsync<Center>(centerID);
+
+                if (careCenter == null)
                 {
                     result.AddError("root", "root Folder not found");
                 }
                 else
                 {
-                    result.Value = rootFolder;
+                    result.Value = careCenter.RootFolder;
                 }
             }
 
             return result;
         }
+        #endregion
 
-        //public async Task<HttpResponseMessage> GetFolderInternals(string Id)
-
+        #region CREATE/SAVE
         /******************************************************************************/
         /***************************   CREATE/SAVE   **********************************/
         /******************************************************************************/
@@ -95,29 +93,7 @@ namespace FileAttacher.Controllers
 
             return result;
         }
-
-        /******************************************************************************/
-        /***************************     MODIFY      **********************************/
-        /******************************************************************************/
-
-        /*
-        public async Task<Result> AddFileToFolder(string idFile, string idDestination) // old folder?
-        {
-
-
-        }
-         */
-
-        /*
-        public async Task<Result> AddFolderToFolder(string idFolder, string idDestination)
-        {
-
-        }
-        */
-        /******************************************************************************/
-        /***************************     REMOVE      **********************************/
-        /******************************************************************************/
+        #endregion
         
-
     }
 }

@@ -19,9 +19,7 @@ namespace FileAttacher.Controllers
             var test = RequestMessage;
         }
 
-        /******************************************************************************/
-        /***************************     REMOVE      **********************************/
-        /******************************************************************************/
+        #region Remove
         [HttpGet, HttpPost]
         public async Task<HttpResponseMessage> RemoveFile(string centerID, Guid fileID)
         {
@@ -97,10 +95,9 @@ namespace FileAttacher.Controllers
 
             return result;
         }
+        #endregion
 
-        /******************************************************************************/
-        /***************************   CREATE/SAVE   **********************************/
-        /******************************************************************************/
+        #region Create/Save
         [HttpGet, HttpPost]
         public async Task<HttpResponseMessage> SaveUploads(string centerID, Guid folderID, List<FileAtt> files)
         {
@@ -196,7 +193,6 @@ namespace FileAttacher.Controllers
 
             return result;
         }
-
         private string ReturnExtension(string fileExtension)
         {
             try
@@ -313,5 +309,6 @@ namespace FileAttacher.Controllers
                 return "application/octet-stream"; //default case
             }
         }
-	}
+        #endregion
+    }
 }
