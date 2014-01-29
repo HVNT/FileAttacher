@@ -45,6 +45,23 @@
     tbody tr i {
         cursor: pointer;
     }
+    tbody .name-col {
+        min-width:225px;
+    }
+    thead .first-col-head {
+        min-width: 30px;
+    }
+    thead .name-col-head {
+        min-width:225px;
+    }
+    #emptyTableView {
+        font-size:17.5px;
+        color:#999;
+        cursor:pointer;
+    }
+    #emptyTableView i {
+        margin-left:2%;
+    }
 </style>
 
 <div id="ViewModel">
@@ -70,40 +87,48 @@
                     <!-- File(s) table-->
                     <table class="table" >
                         <thead>
-                            <tr class="table-head">
-                                <td>&nbsp;</td>
-                                <td>Name</td>
-                                <td>Type</td>
-                                <td><i title="Download File" data-placement="top" class="icon-download-alt"></i></td>
-                                <td>&nbsp;</td>
-                            </tr>
+                            <tr class=" table-head">
+                        <td class="first-col-head">
+                            <button class="btn btn-mini btn-info" data-bind="visible:$root.MainViewModel.folderNav().length > 1, click:$root.MainViewModel.navBack">
+                                <i class="icon-white icon-chevron-left"></i>
+                            </button>
+                        </td>
+                        <td class="name-col-head">Name</td>
+                        <td>Type</td>
+                        <td><i title="Download File" data-placement="top" class="icon-download-alt"></i></td>
+                        <td>&nbsp;</td>
+                        </tr>
                         </thead>
-                        <tbody data-bind="foreach: MainViewModel.folders">
+                        <tbody data-bind="foreach: $root.MainViewModel.folders, visible: ($root.MainViewModel.files().length > 0 && $root.MainViewModel.folders().length > 0)">
                             <tr>
                                 <td>
-                                    <i data-bind="visible: MimeType == 'folder', click:$root.MainViewModel.openFolder" class="icon-folder-close"></i>
+                                    <i data-bind="visible: MimeType == 'folder', click:$root.MainViewModel.openFolderWrap" class="icon-folder-close"></i>
                                 </td>
-                                <td data-bind="text: Filename"></td>
+                                <td class="name-col" data-bind="text: Filename"></td>
                                 <td data-bind="text: MimeType"></td>
-                                <td data-bind="click:$root.MainViewModel.zipFolder">zip??</td>
-                                <td><i data-bind="click:$root.MainViewModel.removeFolder" class="icon-trash"></i></td>
+                                <td data-bind="click:$root.MainViewModel.zipFolder">&nbsp;</td>
+                                <td><i title="Delete" data-placement="right" data-bind="click:$root.MainViewModel.removeFolder" class="icon-trash"></i></td>
                             </tr>
                         </tbody>
-                        <tbody id="fileTable" data-bind="foreach: MainViewModel.files">
+                        <tbody id="fileTable" data-bind="foreach: $root.MainViewModel.files, visible: ($root.MainViewModel.files().length > 0 && $root.MainViewModel.folders().length > 0)">
                             <tr>
                                 <td>
-                                    <a id="imgBlow" data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }">
+                                    <a id="imgblow" data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }">
                                         <i data-bind="click:$root.MainViewModel.showImage, visible: MimeType == 'image/jpeg'" class="icon-fullscreen"></i>
                                     </a>
                                 </td>
-                                <td data-bind="text: Filename"></td>
+                                <td class="name-col" data-bind="text: Filename"></td>
                                 <td data-bind="text: MimeType"></td>
                                 <td><a data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }" class="btn btn-small" target="_blank"><i class="icon-download"></i></a></td>
                                 <td><i data-bind="click:$root.MainViewModel.removeFile" class="icon-trash"></i></td>
-
                             </tr>
                         </tbody>
                     </table>
+
+                    <!-- Empty Table? Show message-->
+                    <div id="emptyTableView" data-bind="visible: ($root.MainViewModel.files().length < 1 && $root.MainViewModel.folders().length < 1)">
+                            <p class="text-center">ADD A FILE <br/><br /><i class="icon-file"></i></p>
+                    </div>
                 </div>
             </div>
         </div>

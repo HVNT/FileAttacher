@@ -45,8 +45,15 @@ namespace FileAttacher.Controllers
 
             using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
             {
-                FileAtt existingFile = await session.LoadAsync<FileAtt>(Id);
+                // delete file from folder
+                
+
+                FileAtt existingFile = await session.LoadAsync<FileAtt>(Id); // delete file Att
                 session.Delete(existingFile);
+
+                List<Folder> containingFolder = await session.Query<Folder>().Where(x => x.FileAttsIds.Contains(Id)).Take(1).ToListAsync() as List<Folder>;
+                session.Delete(containingFolder[0].FileAttsIds[containingFolder[0].FileAttsIds.IndexOf(Id)]);
+
                 await session.SaveChangesAsync();
 
                 result.Value = "success"; // put string here instead with success remove msg?

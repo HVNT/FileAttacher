@@ -6,7 +6,11 @@
     self.folders = ko.observableArray(); // container for current folder
     self.createNewFolder = ko.observable(false); // show new folder input field?
     self.newFolderName = ko.observable(""); // new folder input field text
-    
+    self.folderNav = ko.observableArray(); // for nested folder nav, when empty at root
+
+    //self.showOpen = ko.observable(false); open folder icon v closed on hover
+
+
     //ON page load
     $.ajax({
         type: "GET",
@@ -14,10 +18,15 @@
         dataType: "json",
         url: "/api/v1/Folder/GetFolder?id=" + self.currFolderId(), //root
         success: function (data) {
+
             console.log(data);
+            
             self.currFolderId(data.Id);
             self.files(data.FileAtts);
             self.folders(data.Folders);
+
+            // push to current folderNav
+            self.folderNav.push(data.Id);
         },
         error: function (data) {
             console.log(data);
@@ -49,7 +58,8 @@
      * Show image preview on modal on full screen icon click
      */
     self.showImage = function () {
-        $("a#imgBlow").fancybox({
+
+        $("a#imgblow").fancybox({
             'type': 'image'
         });
     }
@@ -92,23 +102,31 @@
                 data: JSON.stringify(folder),
                 success: function (data) {
                     console.log(data);
+                    self.folders(data);
+
                 },
                 error: function (data) {
                     console.log(data);
                 }
             });
-            //self.files.push(folder);
         }
-        self.showFolderInput();
-        self.newFolderName("");
+
+        self.showFolderInput(); // hide new folder input field
+        self.newFolderName(""); // clear new folder input field
     }
 
     self.zipFolder = function (folder) {
         console.log("TODO");
     }
 
-    self.openFolder = function (folder) {
-        self.currFolderId(folder.Id);
+    // couldnt figure out how to only pass Id as param, used this as 
+    // wrapper to make openFolder more usable
+    self.openFolderWrap = function (folder) {
+        self.openFolder(folder.Id);
+    }
+
+    self.openFolder = function (Id) {
+        self.currFolderId(Id);
 
         $.ajax({
             type: "GET",
@@ -116,26 +134,43 @@
             dataType: "json",
             url: "/api/v1/Folder/GetFolder?id=" + self.currFolderId(), //root
             success: function (data) {
-                console.log(data);
+
                 self.currFolderId(data.Id);
                 self.files(data.FileAtts);
                 self.folders(data.Folders);
+                 
+                // push to folderNav to know location
+                self.folderNav.push(data.Id);
             },
             error: function (data) {
                 console.log(data);
             }
         });
+
     }
 
     self.removeFolder = function (folder) {
         console.log("TODO");
     }
 
+    /*
+     * On click : nav back by using self.folderNav arr
+     */
+    self.navBack = function (data) {
+
+        var curr = self.folderNav.pop(); // pop current
+
+        self.openFolder(self.folderNav.pop()); // set to last
+    }
+
+
     /* tooltips for icons */
     $(function () {
         $('.icon-file').tooltip();
         $('.icon-folder-open').tooltip();
         $('.icon-download-alt').tooltip();
+//        $('.icon-fullscreen').tooltip(); //?
+        $('.icon-trash').tooltip(); //?
     });
 
 }

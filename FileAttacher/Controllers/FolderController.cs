@@ -133,7 +133,7 @@ namespace FileAttacher.Controllers
             if (!result.IsValid)
                 return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
 
-            return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value);
+            return RequestMessage.CreateResponse(HttpStatusCode.OK, f);
         }
         private async Task<Result> Create(string folderID, Folder f)
         {
@@ -155,7 +155,7 @@ namespace FileAttacher.Controllers
 
                 await session.SaveChangesAsync();
 
-                result.Value = f.Id;
+                //result.Value = f.Id;
             }
 
             return result;
