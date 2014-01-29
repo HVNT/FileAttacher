@@ -78,13 +78,23 @@ namespace FileAttacher.Controllers
 
             using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
             {
+
                 Folder targetFolder = null;
-                Boolean found = false;
-
-                // delete file from folder
                 Center careCenter = await session.LoadAsync<Center>(centerID); // load care center given ID
-
                 Folder temp = careCenter.RootFolder;
+
+                // quick check to see if at root since this is most likely use case\
+                if (temp.g == folderID)
+                {
+                    targetFolder = temp; // set to target
+
+                    targetFolder.Folders.Add(f); // add to target
+                    await session.SaveChangesAsync();
+
+                    result.Value = "successful add of file to folder w/ guidID" + folderID;
+
+                    return result;
+                }
                 Queue<Folder> q = new Queue<Folder>(); // dfs
                 q.Enqueue(temp); // put root on top
 
@@ -97,11 +107,10 @@ namespace FileAttacher.Controllers
                         if (folder.g == folderID) // folder found!
                         {
                             targetFolder = folder; // get folder ref
-                            found = true; // set found to true for while break
                             break; // break foreach if found
                         }
                     }
-                    if (found)
+                    if (targetFolder!=null)
                     {
                         break; // if found break while loop
                     }
@@ -132,6 +141,80 @@ namespace FileAttacher.Controllers
             return result;
         }
         #endregion
-        
+
+        #region DELETE
+        [HttpGet, HttpPost]
+        public async Task<HttpResponseMessage> RemoveFolder(string cID, Guid folderID)
+        {
+            var result = await Remove(cID, folderID);
+
+            if (!result.IsValid)
+                return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
+
+            return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value); //result.Value = id removed
+        }
+        private async Task<Result> Remove(string centerID, Guid folderID)
+        {
+
+            var result = new Result();
+
+            if (String.IsNullOrEmpty(centerID))
+            {
+                result.AddError("No centerID", "centerID required for removal");
+                return result;
+            }
+
+            using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
+            {
+                Folder targetFolder = null;
+                Center careCenter = await session.LoadAsync<Center>(centerID); // load care center given ID
+                Folder temp = careCenter.RootFolder;
+
+                Queue<Folder> q = new Queue<Folder>(); // dfs
+                q.Enqueue(temp); // put root on top
+
+                while (q.Count > 0) // while folders remain
+                {
+                    Folder current = q.Dequeue();
+
+                    foreach (var folder in current.Folders)
+                    {
+                        if (folder.g == folderID) // folder found!
+                        {
+                            targetFolder = folder; // get folder ref
+                            break; // break foreach if found
+                        }
+                    }
+                    if (targetFolder != null)
+                    {
+                        break; // if found break while loop
+                    }
+                    else // !found
+                    {
+                        foreach (var folder in current.Folders) // add all current avail folders to queue
+                        {
+                            q.Enqueue(folder);
+                        }
+                    }
+                }
+
+                if (targetFolder == null) // shit
+                {
+                    result.AddError("No Folder found to add to", "under that guid uhoh.");
+                    return result;
+                }
+                else // all good, targetFolder to delete was found
+                {
+                    // delete targetFolder
+                    session.Delete(targetFolder);
+                    await session.SaveChangesAsync();
+
+                    result.Value = "successful add of folder to folder w/ guidID" + folderID;
+                }
+            }
+
+            return result;
+        }
+        #endregion
     }
 }

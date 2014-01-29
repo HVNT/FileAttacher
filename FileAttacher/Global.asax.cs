@@ -79,7 +79,7 @@ namespace FileAttacher
             routes.MapHttpRoute(
                 name: "RemoveFileApi",
                 routeTemplate: "api/v1/FileAtt/RemoveFile",
-                defaults: new { Controller = "FileAtt", Action = "RemoveFile", id = RouteParameter.Optional },
+                defaults: new { Controller = "FileAtt", Action = "RemoveFile" },
                 constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
                 );
             
