@@ -98,11 +98,12 @@ namespace FileAttacher.Controllers
         #endregion
 
         #region Create/Save
-        [HttpGet, HttpPost]
-        public async Task<HttpResponseMessage> SaveUploads(string cID, Guid folderID, List<FileAtt> files)
+        [HttpPost]
+        public async Task<HttpResponseMessage> SaveUploads(string cID, string g, List<FileAtt> files)
         {
+            Guid guid = new Guid(g);
 
-            var result = await BulkSave(cID, folderID, files);
+            var result = await BulkSave(cID, guid, files);
 
             if (!result.IsValid)
                 return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
@@ -318,7 +319,7 @@ namespace FileAttacher.Controllers
                         return "application/octet-stream";
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return "application/octet-stream"; //default case
             }

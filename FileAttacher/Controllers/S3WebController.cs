@@ -77,7 +77,7 @@ namespace FileAttacher.Controllers
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -204,7 +204,7 @@ namespace FileAttacher.Controllers
                         return "application/octet-stream";
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return "application/octet-stream"; //default case
             }

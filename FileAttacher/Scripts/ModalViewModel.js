@@ -55,7 +55,6 @@ function ModalViewModel() {
 
     self.showModal = function (root) {
         //h4ck to set currFolderId from MainViewModel
-        console.log(root);
         self.currFolderId(root.MainViewModel.currFolderId());
 
         self.modal.show(true);
@@ -75,6 +74,7 @@ function ModalViewModel() {
             if (responseJSON.success) {
                 self.fileAttachs.push(
                     {
+                        Guid: '',
                         Key: responseJSON.S3FileName,
                         MimeType : '', // set on server side on save
                         Filename: name,
@@ -94,14 +94,15 @@ function ModalViewModel() {
         console.log(self.fileAttachs);
         console.log(self.currFolderId());
         var fArr = self.fileAttachs;
-        var fID = self.currFolderId();
+        var fID = new String(self.currFolderId());
+
         
         $.ajax({
             type: "POST",
             contentType: "application/json",
             dataType: "json",
             url: "/api/v1/FileAtt/SaveUploads",
-            data: JSON.stringify({ cID: careCenterID, folderID: fID, files: fArr }), // file guid
+            data: JSON.stringify({ cID: careCenterID, g: fID, files: fArr }), // file guid
             success: function (data) {
                 console.log(data);
             },
