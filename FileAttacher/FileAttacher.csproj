@@ -156,6 +156,7 @@
     </Compile>
     <Compile Include="Models\Center.cs" />
     <Compile Include="Models\Attachments.cs" />
+    <Compile Include="Models\ProtoContain.cs" />
     <Compile Include="Models\Folder.cs" />
     <Compile Include="Models\Error.cs" />
     <Compile Include="Models\Result.cs" />

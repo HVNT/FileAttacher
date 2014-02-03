@@ -101,11 +101,13 @@ namespace FileAttacher.Controllers
         #region Create/Save
         //[Route("SaveUploads")]
         [HttpPost]
-        public async Task<HttpResponseMessage> SaveUploads(string cID, string g, List<FileAtt> files)
+        public async Task<HttpResponseMessage> SaveUploads(ProtoContain data)
         {
-            Guid guid = new Guid(g);
+            String cID = data.centerIndex;
+            Guid g = data.ID;
+            List<FileAtt> files = data.FileAtts;
 
-            var result = await BulkSave(cID, guid, files);
+            var result = await BulkSave(cID, g, files);
 
             if (!result.IsValid)
                 return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);

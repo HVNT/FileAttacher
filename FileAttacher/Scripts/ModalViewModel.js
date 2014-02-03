@@ -96,14 +96,16 @@ function ModalViewModel() {
         var fArr = self.fileAttachs;
         var fID = new String(self.currFolderId());
 
+        console.log(fArr);
+        console.log(fID);
+
         
         $.ajax({
             type: "POST",
             contentType: "application/json",
             dataType: "json",
             url: "/api/v1/FileAtt/SaveUploads",
-            //data: JSON.stringify(careCenterID, fID, fArr),
-            data: JSON.stringify({ g: fID, cID: careCenterID, files: fArr }), // file guid
+            data: JSON.stringify({ centerIndex: careCenterID, ID: fID, FileAtts: fArr }), // file guid
             success: function (data) {
                 console.log(data);
             },
