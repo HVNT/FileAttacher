@@ -101,7 +101,7 @@ namespace FileAttacher.Controllers
         #region Create/Save
         //[Route("SaveUploads")]
         [HttpPost]
-        public async Task<HttpResponseMessage> SaveUploads(ProtoContain data)
+        public async Task<HttpResponseMessage> SaveUploads(FileProtoContain data)
         {
             String cID = data.centerIndex;
             Guid g = data.ID;

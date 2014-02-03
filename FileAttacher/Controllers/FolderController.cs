@@ -56,8 +56,11 @@ namespace FileAttacher.Controllers
 
         #region CREATE/SAVE
         [HttpGet, HttpPost]
-        public async Task<HttpResponseMessage> SaveFolder(string cID, Guid folderID, Folder f)
+        public async Task<HttpResponseMessage> SaveFolder(FolderProtoContain data)
         {
+            string cID = data.centerIndex;
+            Guid folderID = data.folderID;
+            Folder f = data.newfolder;
 
             var result = await Create(cID, folderID, f);
 

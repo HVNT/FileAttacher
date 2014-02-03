@@ -1,4 +1,5 @@
 ﻿<style>
+    ul {margin-bottom:0px}
     #fine-uploader {
         margin-top:15px;
         padding-left:20px;
@@ -24,36 +25,12 @@
     #appContent.file-controls {
         margin-top:10px;
     }
-    .table thead tr {
-        margin: 10px 0;
-        font-family: inherit;
-        line-height: 20px;
-        color: inherit;
-        text-rendering: optimizelegibility;
-        font-size: 17.5px;
-    }
     .main-cat {
         font-family: inherit;
         line-height: 20px;
         color: #999;
         text-rendering: optimizelegibility;
         font-size: 17.5px;
-    }
-    tbody tr .btn {
-        cursor: pointer;
-    }
-    tbody tr i {
-        cursor: pointer;
-    }
-    tbody .name-col {
-        min-width: 225px;
-        cursor: pointer;
-    }
-    thead .first-col-head {
-        min-width: 30px;
-    }
-    thead .name-col-head {
-        min-width:225px;
     }
     #emptyTableView {
         font-size:17.5px;
@@ -97,42 +74,41 @@
                 <!-- File(s) table -->
                 <div id="table-container">
                     <!-- File(s) table header -->
-                    <ul>
-                        <li>
+                    <ul class="inline row-fluid">
+                        <li class="span1">
                             <button class="btn btn-mini btn-info" data-bind="visible:$root.MainViewModel.folderNav().length > 1, click:$root.MainViewModel.navBack">
                                 <i class="icon-white icon-chevron-left"></i>
                             </button>
                         </li>
-                        <li class="name-col-head">Name</li>
-                        <li>Type</li>
-                        <li><i title="Download File" data-placement="top" class="icon-download-alt"></i></li>
-                        <li>&nbsp;</li>
+                        <li class="span5">Name</li>
+                        <li class="span2">Type</li>
+                        <li class="span1"><i title="Download File" data-placement="top" class="icon-download-alt"></i></li>
+                        <li></li>
                     </ul>
                     <!-- Folder(s) table body-->
-                    <ul data-bind="foreach: $root.MainViewModel.folders, visible: ($root.MainViewModel.files().length > 0 && $root.MainViewModel.folders().length > 0)">
-                        <li>
-                            <span><i data-bind="visible: MimeType == 'folder', click:$root.MainViewModel.openFolderWrap" class="icon-folder-close"></i></span>
-                            <span data-bind ="text: MimeType"></span>
-                            <span data-bind="click:$root.MainViewModel.zipFolder">zip</span>
-                            <span><i title="Delete" data-placement="right" data-bind="click:$root.MainViewModel.removeFolder" class="icon-trash"></i></span>
+                    <ul class="unstyled folders-body" data-bind="foreach: $root.MainViewModel.folders, visible: ($root.MainViewModel.files().length > 0 && $root.MainViewModel.folders().length > 0)">
+                        <li class="row-fluid">
+                            <span class="span1"><i data-bind="visible: MimeType == 'folder', click:$root.MainViewModel.openFolderWrap" class="icon-folder-close"></i></span>
+                            <span class="span5" data-bind="text: Filename"></span>
+                            <span class="span2" data-bind="text: MimeType"></span>
+                            <span class="span1" data-bind="click:$root.MainViewModel.zipFolder">zip</span>
+                            <span class="span1"><i title="Delete" data-placement="right" data-bind="click:$root.MainViewModel.removeFolder" class="icon-trash"></i></span>
                         </li>
                     </ul>
                     <!-- File(s) table body -->
-                    <ul data-bind="foreach: $root.MainViewModel.files, visible: ($root.MainViewModel.files().length > 0 && $root.MainViewModel.folders().length > 0)">
-                        <li>
-                            <span>
-                                <!--<a id="imgblow" data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }">
-                                        <i data-bind="click:$root.MainViewModel.showImage, visible: MimeType == 'image/jpeg'" class="icon-fullscreen"></i>
-                                </a>-->
+                    <ul class="unstyled files-body" data-bind="foreach: $root.MainViewModel.files, visible: ($root.MainViewModel.files().length > 0 && $root.MainViewModel.folders().length > 0)">
+                        <li class="row-fluid">
+                            <span class="span1">
+                                <a id="imgblow" data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }">
+                                    <i data-bind="click:$root.MainViewModel.showImage, visible: MimeType == 'image/jpeg'" class="icon-fullscreen"></i>
+                                </a>
                             </span>
-                            <span class="name-col" data-bind="text: Filename"></span>
-                            <span data-type="text:MimeType"></span>
-                            <span>
-                                <!--
+                            <span class="span5" data-bind="text: Filename"></span>
+                            <span class="span2" data-type="text:MimeType"></span>
+                            <span class="span1">
                                 <a data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key },  target:'_blank'" class=" btn btn-small"><i class="icon-download"></i></a>
-                                -->
                             </span>
-                            <span><i data-bind="click:$root.MainViewModel.removeFile" class="icon-trash"></i></span>
+                            <span class="span1"><i data-bind="click:$root.MainViewModel.removeFile" class="icon-trash"></i></span>
                         </li>
                     </ul>
                 </div> <!-- End .table-container -->

@@ -107,7 +107,8 @@ function ModalViewModel() {
             url: "/api/v1/FileAtt/SaveUploads",
             data: JSON.stringify({ centerIndex: careCenterID, ID: fID, FileAtts: fArr }), // file guid
             success: function (data) {
-                console.log(data);
+                console.log('prolly get rid of location.reload()..');
+                location.reload(); // eh?
             },
             error: function (data) {
                 console.log(data);

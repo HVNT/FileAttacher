@@ -26,7 +26,6 @@
             self.files(data.FileAtts);
             self.folders(data.Folders);
 
-            makeDummData();
             // push to current folderNav
             //self.folderNav.push(data.Id);
         },
@@ -101,11 +100,10 @@
                 contentType: "application/json",
                 dataType: "json",
                 url: "/api/v1/Folder/SaveFolder",
-                data: JSON.stringify({ cID: careCenterID, folderID: fID, f: folder}),
+                data: JSON.stringify({ centerIndex: careCenterID, folderID: fID, newfolder: folder }),
                 success: function (data) {
                     console.log(data);
-                    self.folders(data);
-
+                    self.folders.push(data);
                 },
                 error: function (data) {
                     console.log(data);
@@ -180,22 +178,5 @@
     self.moveItem = function () {
 
 
-    }
-
-    var makeDummData = function () {
-        
-        self.files.push(
-            { Filename: "purple rhino", MimeType: "image/jpeg", g: "4e95ca3c-9107-462a-a375-109587b219es" },
-            { Filename: "blue cow", MimeType: "image/jpeg", g: "1e95da3c-9107-462a-a375-109587b219ed" },
-            { Filename: "orange bear", MimeType: "image/jpeg", g: "2e95da3c-9107-462a-a375-101532b219ed" },
-            { Filename: "yellow jackets", MimeType: "image/jpeg", g: "4f95dx3c-9107-462a-a375-109587b219zd" },
-            { Filename: "green panda", MimeType: "image/jpeg", g: "5e25da3c-9107-462a-a375-109587b219ed" }
-        );
-
-        self.folders.push(
-            { Filename: "purple", MimeType: "folder", g: "4c95da3c-4327-423v-a375-145687b219ed" },
-            { Filename: "blue", MimeType: "folder", g: "1x95da3c-9647-442a-a375-109587b219ed" },
-            { Filename: "orange", MimeType: "folder", g: "2v95da3c-9237-462a-a375-109587b219ed" }
-        );
     }
 }

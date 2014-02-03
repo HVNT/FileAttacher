@@ -5,10 +5,10 @@ using System.Web;
 
 namespace FileAttacher.Models
 {
-    public class ProtoContain
+    public class FolderProtoContain
     {
         public string centerIndex { get; set; }
-        public Guid ID { get; set; }
-        public List<FileAtt> FileAtts {get; set;}
+        public Guid folderID { get; set; }
+        public Folder newfolder { get; set; }
     }
 }
