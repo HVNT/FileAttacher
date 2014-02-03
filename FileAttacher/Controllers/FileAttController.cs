@@ -12,6 +12,7 @@ using System.Web.Mvc;
 
 namespace FileAttacher.Controllers
 {
+    //[RoutePrefix("api/v1/FileAtt")]
     public class FileAttController : RavenApiController
     {
         public FileAttController()
@@ -98,6 +99,7 @@ namespace FileAttacher.Controllers
         #endregion
 
         #region Create/Save
+        //[Route("SaveUploads")]
         [HttpPost]
         public async Task<HttpResponseMessage> SaveUploads(string cID, string g, List<FileAtt> files)
         {

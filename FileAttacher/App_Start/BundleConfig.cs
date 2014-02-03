@@ -16,6 +16,7 @@ namespace FileAttacher
                     "~/Scripts/bootstrap.js",
                     "~/Scripts/respond.js",
                     "~/Scripts/uploader.min.js",
+                    "~/Scripts/jquery-ui-1.10.4.min.js",
                     "~/Scripts/jquery.fancybox-1.3.4_patch.js",
                     "~/Scripts/jquery.fineuploader-3.1.min.js"));
 

@@ -102,7 +102,8 @@ function ModalViewModel() {
             contentType: "application/json",
             dataType: "json",
             url: "/api/v1/FileAtt/SaveUploads",
-            data: JSON.stringify({ cID: careCenterID, g: fID, files: fArr }), // file guid
+            //data: JSON.stringify(careCenterID, fID, fArr),
+            data: JSON.stringify({ g: fID, cID: careCenterID, files: fArr }), // file guid
             success: function (data) {
                 console.log(data);
             },

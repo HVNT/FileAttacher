@@ -12,6 +12,7 @@ using System.Web.Mvc;
 
 namespace FileAttacher.Controllers
 {
+    [RoutePrefix("api/v1/Folder")]
     public class FolderController : RavenApiController
     {
         public FolderController()

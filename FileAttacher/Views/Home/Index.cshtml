@@ -46,7 +46,8 @@
         cursor: pointer;
     }
     tbody .name-col {
-        min-width:225px;
+        min-width: 225px;
+        cursor: pointer;
     }
     thead .first-col-head {
         min-width: 30px;
@@ -61,6 +62,16 @@
     }
     #emptyTableView i {
         margin-left:2%;
+    }
+    .pad-draggable {
+        padding-left:100px;
+    }
+    .drag-table-item {
+        color: WHITE;
+        background: #92aab3;
+        padding: 7px;
+        border-radius: 5px;
+        border: 2px solid gray;
     }
 </style>
 
@@ -83,23 +94,23 @@
                     </span>
                 </div>
                 
-                <div>
+                <div id="table-container">
                     <!-- File(s) table-->
-                    <table class="table" >
+                    <table id="Table1" class="table">
                         <thead>
-                            <tr class=" table-head">
-                        <td class="first-col-head">
-                            <button class="btn btn-mini btn-info" data-bind="visible:$root.MainViewModel.folderNav().length > 1, click:$root.MainViewModel.navBack">
-                                <i class="icon-white icon-chevron-left"></i>
-                            </button>
-                        </td>
-                        <td class="name-col-head">Name</td>
-                        <td>Type</td>
-                        <td><i title="Download File" data-placement="top" class="icon-download-alt"></i></td>
-                        <td>&nbsp;</td>
-                        </tr>
+                            <tr class="table-head">
+                                <td class="first-col-head">
+                                    <button class="btn btn-mini btn-info" data-bind="visible:$root.MainViewModel.folderNav().length > 1, click:$root.MainViewModel.navBack">
+                                        <i class="icon-white icon-chevron-left"></i>
+                                    </button>
+                                </td>
+                                <td class="name-col-head">Name</td>
+                                <td>Type</td>
+                                <td><i title="Download File" data-placement="top" class="icon-download-alt"></i></td>
+                                <td>&nbsp;</td>
+                            </tr>
                         </thead>
-                        <tbody data-bind="foreach: $root.MainViewModel.folders, visible: ($root.MainViewModel.files().length > 0 && $root.MainViewModel.folders().length > 0)">
+                        <tbody id="droppable" data-bind="foreach: $root.MainViewModel.folders, visible: ($root.MainViewModel.files().length > 0 && $root.MainViewModel.folders().length > 0)">
                             <tr>
                                 <td>
                                     <i data-bind="visible: MimeType == 'folder', click:$root.MainViewModel.openFolderWrap" class="icon-folder-close"></i>
@@ -111,15 +122,18 @@
                             </tr>
                         </tbody>
                         <tbody id="fileTable" data-bind="foreach: $root.MainViewModel.files, visible: ($root.MainViewModel.files().length > 0 && $root.MainViewModel.folders().length > 0)">
-                            <tr>
+                            <tr class="file">
                                 <td>
-                                    <a id="imgblow" data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }">
+                                    <!--<a id="imgblow" data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }">
                                         <i data-bind="click:$root.MainViewModel.showImage, visible: MimeType == 'image/jpeg'" class="icon-fullscreen"></i>
-                                    </a>
+                                    </a>-->
                                 </td>
                                 <td class="name-col" data-bind="text: Filename"></td>
                                 <td data-bind="text: MimeType"></td>
-                                <td><a data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key },  target:'_blank'" class=" btn btn-small"><i class="icon-download"></i></a></td>
+                                <td><!--
+                                    <a data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key },  target:'_blank'" class=" btn btn-small"><i class="icon-download"></i></a>
+                                -->
+                                </td>
                                 <td><i data-bind="click:$root.MainViewModel.removeFile" class="icon-trash"></i></td>
                             </tr>
                         </tbody>
