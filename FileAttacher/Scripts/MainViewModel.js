@@ -1,4 +1,7 @@
 ﻿function MainViewModel() {
+    //visible:$root.MainViewModel.folderNav().length > 1,
+
+    var careCenterID = "Center/99"; // HARDCODED Care CenterID .. will be in a user profile model??
 
     var self = this; // view model
     self.currFolderId = ko.observable(""); // current folder id - set to root on load
@@ -7,60 +10,15 @@
     self.createNewFolder = ko.observable(false); // show new folder input field?
     self.newFolderName = ko.observable(""); // new folder input field text
 
-    //?
-    self.folderNav = ko.observableArray(); // for nested folder nav, when empty at root
+    self.data = ko.observableArray();
+    //self.rootFolder = {}; // NOTE: not set as observable.. set as object literal for iteration
+    
 
-    var careCenterID = "Center/99"; // HARDCODED Care CenterID
-
-    //ON page load
-    $.ajax({
-        type: "GET",
-        contentType: "application/json",
-        dataType: "json",
-        url: "/api/v1/Folder/GetFolder?cID=" + careCenterID, //root
-        success: function (data) {
-
-            console.log(data);
-            
-            self.currFolderId(data.g);
-            self.files(data.FileAtts);
-            self.folders(data.Folders);
-
-            // push to current folderNav
-            //self.folderNav.push(data.Id);
-        },
-        error: function (data) {
-            console.log(data);
-        }
-    });
-
-    /*
-     * Remove File on action trash can icon click
-     */
-    self.removeFile = function (file) {
-        var f = file;
-
-        $.ajax({
-            type: "POST",
-            contentType: "application/json",
-            dataType: "json",
-            url: "/api/v1/FileAtt/RemoveFile",
-            data: JSON.stringify({cID: careCenterID, fileID: f.g}), // file guid
-            success: function (data) {
-                console.log(data);
-
-            },
-            error: function (data) {
-                console.log(data);
-            }
-        });
-    }
 
     /*
      * Show image preview on modal on full screen icon click
      */
     self.showImage = function () {
-
         $("a#imgblow").fancybox({
             'type': 'image'
         });
@@ -78,13 +36,72 @@
         }
     }
 
+    self.removeFolder = function (folder) {
+        console.log("TODO");
+    }
+
+    /*
+     * On click : nav back by rootFolder
+     */
+    self.navBack = function () {
+
+        if (self.data().length <= 1) { // at root .. DO NOT POP ROOT
+            // do nothing??
+            console.log("..at rootFolder");
+        } else {
+            self.data.pop(); // pop old
+            
+            self.currFolderId(self.data()[self.data().length - 1].g);
+            self.files(self.data()[self.data().length - 1].FileAtts);
+            self.folders(self.data()[self.data().length - 1].Folders);
+        }
+    }
+
+    /*
+     * On click : nav in by rootFolder
+     */
+    self.navIn = function (folder) {
+        console.log(folder);
+        self.data.push(folder); // push new 
+
+        self.currFolderId(self.data()[self.data().length - 1].g); // set to guid of rootFolder on load
+        self.files(self.data()[self.data().length - 1].FileAtts); // set view files
+        self.folders(self.data()[self.data().length - 1].Folders); // set view folders
+
+        // set current folder guid
+    }
+
+
+
+
+    /////////////////////////////////////////////////////////
+    //////////////********** ACTIONS ***********/////////////
+    /////////////////////////////////////////////////////////
+
+    //ON page load
+    $.ajax({
+        type: "GET",
+        contentType: "application/json",
+        dataType: "json",
+        url: "/api/v1/Folder/GetFolder?cID=" + careCenterID, //root
+        success: function (data) {
+            console.log(data);
+            self.data.push(data); // set data at index 0
+            self.currFolderId(data.g); // set to guid of rootFolder on load
+            self.files(data.FileAtts); // set view files
+            self.folders(data.Folders); // set view folders
+        },
+        error: function (data) {
+            console.log(data);
+        }
+    });
+
     /*
      * Save new folder on action click '+' icon
      * Constraint: Folder name cannot be empty || ''
      */
     self.createFolder = function () {
         var fID = self.currFolderId();
-        console.log(fID);
 
         if (!self.newFolderName()) {
             console.log("Folder name cannot be empty.");
@@ -115,68 +132,25 @@
         self.newFolderName(""); // clear new folder input field
     }
 
-    self.zipFolder = function (folder) {
-        console.log("TODO");
-    }
+    /*
+     * Remove File on action trash can icon click
+     */
+    self.removeFile = function (file) {
+        var f = file;
 
-    // couldnt figure out how to only pass Id as param, used this as 
-    // wrapper to make openFolder more usable
-    self.openFolderWrap = function (folder) {
-        self.openFolder(folder.Id);
-    }
-
-    self.openFolder = function (Id) {
-        //self.currFolderId(Id);
-        console.log(Id);
-        //just open folder..
-        /*
         $.ajax({
-            type: "GET",
+            type: "POST",
             contentType: "application/json",
             dataType: "json",
-            url: "/api/v1/Folder/GetFolder?id=" + self.currFolderId(), //root
+            url: "/api/v1/FileAtt/RemoveFile",
+            data: JSON.stringify({ centerIndex: careCenterID, ID: f.g }), // file guid
             success: function (data) {
-
-                self.currFolderId(data.Id);
-                self.files(data.FileAtts);
-                self.folders(data.Folders);
-                 
-                // push to folderNav to know location
-                self.folderNav.push(data.Id);
+                console.log(data);
+                //remove from view.. give some response like a delay fade to show delete
             },
             error: function (data) {
                 console.log(data);
             }
         });
-        */
-    }
-
-    self.removeFolder = function (folder) {
-        console.log("TODO");
-    }
-
-    /*
-     * On click : nav back by using self.folderNav arr
-     */
-    self.navBack = function (data) {
-
-        var curr = self.folderNav.pop(); // pop current
-
-        self.openFolder(self.folderNav.pop()); // set to last
-    }
-
-
-    /* tooltips for icons */
-    $(function () {
-        $('.icon-file').tooltip();
-        $('.icon-folder-open').tooltip();
-        $('.icon-download-alt').tooltip();
-//        $('.icon-fullscreen').tooltip(); //?
-        $('.icon-trash').tooltip(); //?
-    });
-
-    self.moveItem = function () {
-
-
     }
 }

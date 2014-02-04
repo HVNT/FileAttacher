@@ -1,55 +1,5 @@
 ﻿<style>
-    ul {margin-bottom:0px}
-    #fine-uploader {
-        margin-top:15px;
-        padding-left:20px;
-        padding-right:20px;
-        min-height: 200px;
-    }
-    .header-cat {
-        margin: 15px 0px 30px;
-    }
-    .icon-file {
-        margin-right: 15px;
-    }
-    #newFolderInput {
-        margin-left:10px;
-        margin-bottom: 0px;
-    }
-    #fileTable {
-        border-top:none;
-    }
-    .file-controls {
-        line-height:35px;
-    }
-    #appContent.file-controls {
-        margin-top:10px;
-    }
-    .main-cat {
-        font-family: inherit;
-        line-height: 20px;
-        color: #999;
-        text-rendering: optimizelegibility;
-        font-size: 17.5px;
-    }
-    #emptyTableView {
-        font-size:17.5px;
-        color:#999;
-        cursor:pointer;
-    }
-    #emptyTableView i {
-        margin-left:2%;
-    }
-    .pad-draggable {
-        padding-left:100px;
-    }
-    .drag-table-item {
-        color: WHITE;
-        background: #92aab3;
-        padding: 7px;
-        border-radius: 5px;
-        border: 2px solid gray;
-    }
+    
 </style>
 
 <div id="ViewModel">
@@ -62,8 +12,8 @@
 
             <div id="appContent" class="span9 fix-height">
                 <div class="header-cat">
-                    <span class="span4 main-cat">FILES - DISCHARGE NOTES</span>
-                    <span class="offset4 file-controls">
+                    <span class="span4 main-cat">Files - Discharge Notes</span>
+                    <span class="offset3 file-controls">
                         <i title="New File" data-placement="top" data-bind="click:ModalViewModel.showModal" class="icon-file"></i>
                         <i title="New Folder" data-placement="top" data-bind="click:$root.MainViewModel.showFolderInput" class="icon-folder-open"></i>
                         <input type="text" class="input-medium" id="newFolderInput" data-bind="visible:$root.MainViewModel.createNewFolder, value:$root.MainViewModel.newFolderName" />
@@ -74,48 +24,51 @@
                 <!-- File(s) table -->
                 <div id="table-container">
                     <!-- File(s) table header -->
-                    <ul class="inline row-fluid">
+                    <ul class="col-heads inline row-fluid">
                         <li class="span1">
-                            <button class="btn btn-mini btn-info" data-bind="visible:$root.MainViewModel.folderNav().length > 1, click:$root.MainViewModel.navBack">
+                            <button class="btn btn-mini btn-info" data-bind="visible:$root.MainViewModel.data().length > 1, click:$root.MainViewModel.navBack">
                                 <i class="icon-white icon-chevron-left"></i>
                             </button>
                         </li>
-                        <li class="span5">Name</li>
-                        <li class="span2">Type</li>
+                        <li class="span5">NAME</li>
+                        <li class="span2">TYPE</li>
                         <li class="span1"><i title="Download File" data-placement="top" class="icon-download-alt"></i></li>
                         <li></li>
                     </ul>
-                    <!-- Folder(s) table body-->
-                    <ul class="unstyled folders-body" data-bind="foreach: $root.MainViewModel.folders, visible: ($root.MainViewModel.files().length > 0 && $root.MainViewModel.folders().length > 0)">
-                        <li class="row-fluid">
-                            <span class="span1"><i data-bind="visible: MimeType == 'folder', click:$root.MainViewModel.openFolderWrap" class="icon-folder-close"></i></span>
-                            <span class="span5" data-bind="text: Filename"></span>
-                            <span class="span2" data-bind="text: MimeType"></span>
-                            <span class="span1" data-bind="click:$root.MainViewModel.zipFolder">zip</span>
-                            <span class="span1"><i title="Delete" data-placement="right" data-bind="click:$root.MainViewModel.removeFolder" class="icon-trash"></i></span>
-                        </li>
-                    </ul>
-                    <!-- File(s) table body -->
-                    <ul class="unstyled files-body" data-bind="foreach: $root.MainViewModel.files, visible: ($root.MainViewModel.files().length > 0 && $root.MainViewModel.folders().length > 0)">
-                        <li class="row-fluid">
-                            <span class="span1">
-                                <a id="imgblow" data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }">
-                                    <i data-bind="click:$root.MainViewModel.showImage, visible: MimeType == 'image/jpeg'" class="icon-fullscreen"></i>
-                                </a>
-                            </span>
-                            <span class="span5" data-bind="text: Filename"></span>
-                            <span class="span2" data-type="text:MimeType"></span>
-                            <span class="span1">
-                                <a data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key },  target:'_blank'" class=" btn btn-small"><i class="icon-download"></i></a>
-                            </span>
-                            <span class="span1"><i data-bind="click:$root.MainViewModel.removeFile" class="icon-trash"></i></span>
-                        </li>
-                    </ul>
+                    <!-- Container for all items -->
+                    <div id="table-item-container">
+                        <!-- Folder(s) table body-->
+                        <ul class="unstyled folders-body" data-bind="foreach: $root.MainViewModel.folders, visible: ($root.MainViewModel.folders().length > 0)">
+                            <li class="row-fluid">
+                                <span class="span1"><i data-bind="visible: MimeType == 'folder', click:$root.MainViewModel.navIn" class="icon-folder-close"></i></span>
+                                <span class="span5 name-col" data-bind="text: Filename"></span>
+                                <span class="span3" data-bind="text: MimeType"></span>
+                                <span class="span2"></span>
+                                <span class="span1"><i data-bind="click:$root.MainViewModel.removeFolder" class="icon-trash"></i></span>
+                            </li>
+                        </ul>
+                        <!-- File(s) table body -->
+                        <ul class="unstyled files-body" data-bind="foreach: $root.MainViewModel.files, visible: ($root.MainViewModel.files().length > 0)">
+                            <li class="row-fluid list-col">
+                                <span class="span1">
+                                    <a id="imgblow" data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }">
+                                        <i data-bind="click:$root.MainViewModel.showImage, visible: MimeType == 'image/jpeg'" class="icon-fullscreen"></i>
+                                    </a>
+                                </span>
+                                <span class="span5 name-col" data-bind="text: Filename"></span>
+                                <span class="span3" data-bind="text:MimeType"></span>
+                                <span class="span2">
+                                    <a data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key },  target:'_blank'" class=" btn btn-mini"><i class="icon-download"></i></a>
+                                </span>
+                                <span class="span1"><i data-bind="click:$root.MainViewModel.removeFile" class="icon-trash"></i></span>
+                            </li>
+                        </ul>
+                    </div>
                 </div> <!-- End .table-container -->
 
                 <!-- Empty Table? Show message-->
                 <div id="emptyTableView" data-bind="visible: ($root.MainViewModel.files().length < 1 && $root.MainViewModel.folders().length < 1), click: ModalViewModel.showModal">
-                    <p class="text-center">ADD A FILE <br /><br /><i class="icon-file"></i></p>
+                    <p class="text-center">[ADD A FILE] <br /><br /><i class="icon-file"></i></p>
                 </div>
 
             </div>

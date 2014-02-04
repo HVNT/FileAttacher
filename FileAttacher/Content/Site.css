@@ -46,6 +46,58 @@ input[type="checkbox"].input-validation-error {
 
 /*ME*/
 
+ul {margin-bottom:0px}
+#fine-uploader {
+    margin-top:15px;
+    padding-left:20px;
+    padding-right:20px;
+    min-height: 200px;
+}
+.header-cat {
+    margin: 15px 0px 10px;
+}
+.icon-file {
+    margin-right: 15px;
+}
+#newFolderInput {
+    margin-left:10px;
+    margin-bottom: 0px;
+}
+.file-controls {
+    line-height:40px;
+}
+#appContent.file-controls {
+    margin-top:10px;
+}
+.main-cat {
+    font-family: inherit;
+    line-height: 20px;
+    color: #bbb;
+    text-rendering: optimizelegibility;
+    font-size: 20.5px;
+}
+#emptyTableView {
+    margin-top:45px;
+    font-size:22.5px;
+    color:#ddd;
+    cursor:pointer;
+}
+#emptyTableView p:hover {
+    color:#bbb;
+}
+#emptyTableView i {
+    margin-left:2%;
+}
+.pad-draggable {
+    padding-left:100px;
+}
+.drag-table-item {
+    color: WHITE;
+    background: #92aab3;
+    padding: 7px;
+    border-radius: 5px;
+    border: 2px solid gray;
+}
 #appContent {
     padding-top: 20px;
     padding-right: 20px;
@@ -64,4 +116,35 @@ input[type="checkbox"].input-validation-error {
 
 .navbar .brand {
     margin-left: -10px;
+}
+
+ul.col-heads {
+    border-bottom:1px solid #ddd;
+}   ul.col-heads li {
+        padding-left:0px;
+        font-family: inherit;
+        line-height: 20px;
+        color: #999;
+        text-rendering: optimizelegibility;
+        font-size: 10.5px;
+    }
+
+#appContent i:not(.icon-download-alt) {
+    cursor:pointer;
+}
+#table-container .name-col {
+    cursor:pointer;
+}
+/* uncomment to give column border lines
+#table-container .folders-body span {
+    border-right:1px solid #ddd;
+}
+#table-container .files-body span {
+    border-right:1px solid #ddd;
+}
+*/
+/* comment out to give row border lines */
+#table-item-container li {
+    line-height: 40px;
+    border-bottom:1px solid #ddd;
 }

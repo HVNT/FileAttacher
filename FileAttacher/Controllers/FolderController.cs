@@ -148,8 +148,11 @@ namespace FileAttacher.Controllers
 
         #region DELETE
         [HttpGet, HttpPost]
-        public async Task<HttpResponseMessage> RemoveFolder(string cID, Guid folderID)
+        public async Task<HttpResponseMessage> RemoveFolder(FolderProtoContain data)
         {
+            string cID = data.centerIndex;
+            Guid folderID = data.folderID;
+
             var result = await Remove(cID, folderID);
 
             if (!result.IsValid)

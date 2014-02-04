@@ -22,8 +22,11 @@ namespace FileAttacher.Controllers
 
         #region Remove
         [HttpGet, HttpPost]
-        public async Task<HttpResponseMessage> RemoveFile(string cID, Guid fileID)
+        public async Task<HttpResponseMessage> RemoveFile(FileProtoContain data)
         {
+            string cID = data.centerIndex;
+            Guid fileID = data.ID;
+
             var result = await Remove(cID, fileID);
 
             if(!result.IsValid)
@@ -45,7 +48,6 @@ namespace FileAttacher.Controllers
             using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
             {
                 FileAtt f = null;
-                Boolean found = false;
 
                 // delete file from folder
                 Center careCenter = await session.LoadAsync<Center>(centerID); // load care center given ID
@@ -63,11 +65,10 @@ namespace FileAttacher.Controllers
                         if (file.g == fileID) // file found!
                         {
                             f = file; // get file ref
-                            found = true; // set found to true for while break
                             break; // break foreach if found
                         }
                     }
-                    if(found) 
+                    if(f != null) 
                     {
                         break; // if found break while loop
                     }
@@ -144,7 +145,6 @@ namespace FileAttacher.Controllers
             using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
             {                
                 Folder targetFolder = null;
-                Boolean found = false;
 
                 // delete file from folder
                 Center careCenter = await session.LoadAsync<Center>(centerID); // load care center given ID
@@ -178,11 +178,10 @@ namespace FileAttacher.Controllers
                         if (folder.g == folderId) // folder found!
                         {
                             targetFolder = folder; // get folder ref
-                            found = true; // set found to true for while break
                             break; // break foreach if found
                         }
                     }
-                    if(found) 
+                    if(f != null) 
                     {
                         break; // if found break while loop
                     }

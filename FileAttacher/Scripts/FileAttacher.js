@@ -4,6 +4,13 @@ viewModel.ModalViewModel = new ModalViewModel();
 
 $(document).ready(function () {
 
+    /* tooltips for icons */
+    $(function () {
+        $('.icon-file').tooltip();
+        $('.icon-folder-open').tooltip();
+        $('.icon-download-alt').tooltip();
+    });
+
     /* DRAGGABLE */
     var table = $('table'); // get table
 
