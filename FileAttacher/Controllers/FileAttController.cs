@@ -51,14 +51,15 @@ namespace FileAttacher.Controllers
 
                 // delete file from folder
                 Center careCenter = await session.LoadAsync<Center>(centerID); // load care center given ID
-                
+
+                Folder current = null;
                 Folder temp = careCenter.RootFolder;
                 Queue<Folder> q = new Queue<Folder>(); // dfs
                 q.Enqueue(temp); // put root on top
 
                 while (q.Count > 0) // while folders remain
                 {
-                    Folder current = q.Dequeue();
+                    current = q.Dequeue();
 
                     foreach (var file in current.FileAtts)
                     {
@@ -88,7 +89,7 @@ namespace FileAttacher.Controllers
                 }
                 else // all good, file was found
                 {
-                    session.Delete(f);
+                    current.FileAtts.Remove(f);
                     await session.SaveChangesAsync();
 
                     result.Value = "successful remove of file w/ guidID" + fileID;

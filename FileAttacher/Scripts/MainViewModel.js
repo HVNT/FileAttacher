@@ -1,5 +1,4 @@
 ﻿function MainViewModel() {
-    //visible:$root.MainViewModel.folderNav().length > 1,
 
     var careCenterID = "Center/99"; // HARDCODED Care CenterID .. will be in a user profile model??
 
@@ -11,9 +10,6 @@
     self.newFolderName = ko.observable(""); // new folder input field text
 
     self.data = ko.observableArray();
-    //self.rootFolder = {}; // NOTE: not set as observable.. set as object literal for iteration
-    
-
 
     /*
      * Show image preview on modal on full screen icon click
@@ -36,15 +32,10 @@
         }
     }
 
-    self.removeFolder = function (folder) {
-        console.log("TODO");
-    }
-
     /*
      * On click : nav back by rootFolder
      */
     self.navBack = function () {
-
         if (self.data().length <= 1) { // at root .. DO NOT POP ROOT
             // do nothing??
             console.log("..at rootFolder");
@@ -61,18 +52,12 @@
      * On click : nav in by rootFolder
      */
     self.navIn = function (folder) {
-        console.log(folder);
         self.data.push(folder); // push new 
 
         self.currFolderId(self.data()[self.data().length - 1].g); // set to guid of rootFolder on load
         self.files(self.data()[self.data().length - 1].FileAtts); // set view files
         self.folders(self.data()[self.data().length - 1].Folders); // set view folders
-
-        // set current folder guid
     }
-
-
-
 
     /////////////////////////////////////////////////////////
     //////////////********** ACTIONS ***********/////////////
@@ -133,6 +118,30 @@
     }
 
     /*
+     * Remove Folder on action trash can icon click
+     */
+    self.removeFolder = function (folder) {
+        var f = folder;
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            dataType: "json",
+            url: "/api/v1/Folder/RemoveFolder",
+            data: JSON.stringify({ centerIndex: careCenterID, folderID: f.g }), // file guid
+            success: function (data) {
+                console.log(data);
+                //remove from view.. give some response like a delay fade to show delete
+                self.folders.remove(f);
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+
+    }
+
+    /*
      * Remove File on action trash can icon click
      */
     self.removeFile = function (file) {
@@ -146,7 +155,8 @@
             data: JSON.stringify({ centerIndex: careCenterID, ID: f.g }), // file guid
             success: function (data) {
                 console.log(data);
-                //remove from view.. give some response like a delay fade to show delete
+                //.. give some response like a delay fade to show delete
+                self.files.remove(f);
             },
             error: function (data) {
                 console.log(data);

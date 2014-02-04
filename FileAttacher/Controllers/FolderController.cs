@@ -176,13 +176,14 @@ namespace FileAttacher.Controllers
                 Folder targetFolder = null;
                 Center careCenter = await session.LoadAsync<Center>(centerID); // load care center given ID
                 Folder temp = careCenter.RootFolder;
+                Folder current = null;
 
                 Queue<Folder> q = new Queue<Folder>(); // dfs
                 q.Enqueue(temp); // put root on top
 
                 while (q.Count > 0) // while folders remain
                 {
-                    Folder current = q.Dequeue();
+                    current = q.Dequeue();
 
                     foreach (var folder in current.Folders)
                     {
@@ -212,11 +213,10 @@ namespace FileAttacher.Controllers
                 }
                 else // all good, targetFolder to delete was found
                 {
-                    // delete targetFolder
-                    session.Delete(targetFolder);
+                    current.Folders.Remove(targetFolder);
                     await session.SaveChangesAsync();
 
-                    result.Value = "successful add of folder to folder w/ guidID" + folderID;
+                    result.Value = "successful remove of folder to folder w/ guidID" + folderID;
                 }
             }
 

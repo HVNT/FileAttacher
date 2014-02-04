@@ -2,7 +2,6 @@
 function ModalViewModel() {
     
     var self = this;
-    self.currFolderId = ko.observable("");
     var careCenterID = "Center/99"; // HARDCODED Care CenterID ... will be in a user profile model??
 
     ko.bindingHandlers.bootstrapModal = {
@@ -53,9 +52,6 @@ function ModalViewModel() {
     self.fileAttachs = []; // modal fileAtts arr
 
     self.showModal = function (root) {
-        //h4ck to set currFolderId from MainViewModel
-        self.currFolderId(root.MainViewModel.currFolderId());
-        console.log(self.currFolderId);
 
         self.modal.show(true);
         /* Bind FineUploader to modal view */
@@ -93,7 +89,7 @@ function ModalViewModel() {
     self.onModalAction = function () {
 
         var fArr = self.fileAttachs;
-        var fID = self.currFolderId();
+        var fID = viewModel.MainViewModel.currFolderId()
         
         $.ajax({
             type: "POST",
@@ -103,7 +99,7 @@ function ModalViewModel() {
             data: JSON.stringify({ centerIndex: careCenterID, ID: fID, FileAtts: fArr }), // file guid
             success: function (data) {
                 console.log('prolly get rid of location.reload()..');
-                location.reload(); // figure out how to pass root view to push to arr MainViewModel.files
+                viewModel.MainViewModel.push(data);
             },
             error: function (data) {
                 console.log(data);
