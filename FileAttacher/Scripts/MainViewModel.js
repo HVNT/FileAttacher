@@ -64,23 +64,24 @@
     /////////////////////////////////////////////////////////
 
     //ON page load
-    $.ajax({
-        type: "GET",
-        contentType: "application/json",
-        dataType: "json",
-        url: "/api/v1/Folder/GetFolder?cID=" + careCenterID, //root
-        success: function (data) {
-            console.log(data);
-            self.data.push(data); // set data at index 0
-            self.currFolderId(data.g); // set to guid of rootFolder on load
-            self.files(data.FileAtts); // set view files
-            self.folders(data.Folders); // set view folders
-        },
-        error: function (data) {
-            console.log(data);
-        }
-    });
-
+    self.pageLoad = function () {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            dataType: "json",
+            url: "/api/v1/Folder/GetFolder?cID=" + careCenterID, //root
+            success: function (data) {
+                self.data.push(data); // set data at index 0
+                self.currFolderId(data.g); // set to guid of rootFolder on load
+                self.files(data.FileAtts); // set view files
+                self.folders(data.Folders); // set view folders
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+    }
+    
     /*
      * Save new folder on action click '+' icon
      * Constraint: Folder name cannot be empty || ''
@@ -138,7 +139,6 @@
                 console.log(data);
             }
         });
-
     }
 
     /*
@@ -163,4 +163,6 @@
             }
         });
     }
+
+    self.pageLoad(); // load page
 }

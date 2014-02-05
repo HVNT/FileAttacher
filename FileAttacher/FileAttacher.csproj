@@ -156,6 +156,7 @@
     </Compile>
     <Compile Include="Models\Center.cs" />
     <Compile Include="Models\Attachments.cs" />
+    <Compile Include="Models\Crypto.cs" />
     <Compile Include="Models\FolderProtoContain.cs" />
     <Compile Include="Models\FileProtoContain.cs" />
     <Compile Include="Models\Folder.cs" />

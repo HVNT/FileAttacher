@@ -37,7 +37,7 @@ namespace FineUploader
                 var upload = new FineUpload
                 {
                     Filename = xFileName ?? qqFile ?? formFilename, // null coalescing operator
-                    InputStream = formUpload ? request.Files[0].InputStream : request.InputStream
+                    InputStream = formUpload ? request.Files[0].InputStream : request.InputStream // sets the input stream
                 };
 
                 return upload;

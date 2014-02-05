@@ -10,7 +10,7 @@ namespace FileAttacher.Models
     {
         public FileAtt()
         {
-            g = Guid.NewGuid();
+            //g = Guid.NewGuid(); now set to S3FileName guid on success callback from S3
         }
         public Guid g { get; set; }
         public string Key { get; set; }

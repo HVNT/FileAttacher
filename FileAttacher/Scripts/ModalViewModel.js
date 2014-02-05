@@ -68,10 +68,10 @@ function ModalViewModel() {
             (responseJSON) // {S3FileName: "240eadf5-ec49-4d02-93ea-a3a5404f28f7", success: true}
             */
             if (responseJSON.success) {
+                console.log(responseJSON);
                 self.fileAttachs.push(
                     {
-                        Guid: '',
-                        Key: responseJSON.S3FileName,
+                        g: responseJSON.S3FileName,
                         MimeType : '', // set on server side on save
                         Filename: name,
                         Extension: name.slice(name.indexOf('.'), name.length)
@@ -97,9 +97,10 @@ function ModalViewModel() {
             dataType: "json",
             url: "/api/v1/FileAtt/SaveUploads",
             data: JSON.stringify({ centerIndex: careCenterID, ID: fID, FileAtts: fArr }), // file guid
-            success: function (data) {
-                console.log('prolly get rid of location.reload()..');
-                viewModel.MainViewModel.push(data);
+            success: function () {
+                fArr.forEach(function (file) {
+                    viewModel.MainViewModel.files.push(file);
+                });
             },
             error: function (data) {
                 console.log(data);

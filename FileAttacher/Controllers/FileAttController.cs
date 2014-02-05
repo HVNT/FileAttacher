@@ -128,7 +128,7 @@ namespace FileAttacher.Controllers
 
             return result;
         }
-        private async Task<Result> Create(string centerID, Guid folderId, FileAtt f)
+        private async Task<Result> Create(string centerID, Guid folderId, FileAtt f) 
         {
 
             var result = new Result();
@@ -145,11 +145,10 @@ namespace FileAttacher.Controllers
 
             using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
             {                
-                Folder targetFolder = null;
-
                 // delete file from folder
                 Center careCenter = await session.LoadAsync<Center>(centerID); // load care center given ID
-                
+
+                Folder targetFolder = null;
                 Folder temp = careCenter.RootFolder;
                 
                 // quick check to see if at root since this is most likely use case
@@ -205,8 +204,6 @@ namespace FileAttacher.Controllers
                     // add file to targetFolder
                     targetFolder.FileAtts.Add(f);
                     await session.SaveChangesAsync();
-
-                    result.Value = "successful add of file to folder w/ guidID" + folderId;
                 }
             }
 

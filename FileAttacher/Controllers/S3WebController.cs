@@ -1,6 +1,7 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using FineUploader;
+using FileAttacher.Models;
 using Raven.Client;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,9 @@ namespace FileAttacher.Controllers
         // GET: /S3Web/
         public FineUploaderResult UploadFile(FineUpload upload, string extraParam1, string extraParam2)
         {
+            // new Crypto object here?
+            Crypto crypt = new Crypto();
+
             string S3FileName = Guid.NewGuid().ToString();
 
             try
@@ -31,11 +35,13 @@ namespace FileAttacher.Controllers
                 AmazonS3 client; // wasn't getting recognized.. use IAmazonS3 for >= v2.0
                 using (client = Amazon.AWSClientFactory.CreateAmazonS3Client(AWSKeyID, AWSAccessKey))
                 {
-                    MemoryStream ms = new MemoryStream();
+                    
+                    Stream s = crypt.Encrypt( 0, upload.InputStream); 
+
                     PutObjectRequest request = new PutObjectRequest();
                     request.WithBucketName("OneCareFileAttacher")
                    .WithCannedACL(S3CannedACL.PublicRead)
-                   .WithKey(S3FileName).InputStream = upload.InputStream;
+                   .WithKey(S3FileName).InputStream = s;// upload.InputStream 
                     S3Response response = client.PutObject(request);
                 }
             }
@@ -44,13 +50,17 @@ namespace FileAttacher.Controllers
                 return new FineUploaderResult(false, error: ex.Message);
             }
 
+            string MimeType = ReturnExtension(upload.Filename);
             // the anonymous object in the result below will be convert to json and set back to the browser
-            return new FineUploaderResult(true, new { S3FileName = S3FileName });
+            return new FineUploaderResult(true, new { S3FileName = S3FileName }); //, new { MimeType = MimeType }
         }
 
         [HttpGet]
         public ActionResult GetFile(string FileName, string S3FileName)
         {
+            // init crypto here?
+            Crypto crypt = new Crypto();
+
             //string S3FileName = Guid.NewGuid().ToString();
             byte[] contents = new byte[16 * 1024];
             try
@@ -71,9 +81,11 @@ namespace FileAttacher.Controllers
                         int read;
                         while ((read = response.ResponseStream.Read(buffer, 0, buffer.Length)) > 0)
                         {
-                            ms.Write(buffer, 0, read);
+                            ms.Write(buffer, 0, read); 
                         }
-                        contents = ms.ToArray();
+                        // decrpyt here?
+                        byte[] xData = ms.ToArray();
+                        contents = crypt.Decrypt(0, xData);
                     }
                 }
             }

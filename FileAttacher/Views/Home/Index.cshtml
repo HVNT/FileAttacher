@@ -51,14 +51,14 @@
                         <ul class="unstyled files-body" data-bind="foreach: $root.MainViewModel.files, visible: ($root.MainViewModel.files().length > 0)">
                             <li class="row-fluid list-col">
                                 <span class="span1">
-                                    <a id="imgblow" data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key }">
+                                    <a id="imgblow" data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + g }">
                                         <i data-bind="click:$root.MainViewModel.showImage, visible: MimeType == 'image/jpeg'" class="icon-fullscreen"></i>
                                     </a>
                                 </span>
                                 <span class="span5 name-col" data-bind="text: Filename"></span>
                                 <span class="span3" data-bind="text:MimeType"></span>
                                 <span class="span2">
-                                    <a data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + Key },  target:'_blank'" class=" btn btn-mini"><i class="icon-download"></i></a>
+                                    <a data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + g },  target:'_blank'" class=" btn btn-mini"><i class="icon-download"></i></a>
                                 </span>
                                 <span class="span1"><i data-bind="click:$root.MainViewModel.removeFile" class="icon-trash"></i></span>
                             </li>
