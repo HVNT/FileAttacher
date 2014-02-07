@@ -39,9 +39,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AWSSDK, Version=1.5.0.0, Culture=neutral, PublicKeyToken=cd2d24cd2bace800, processorArchitecture=MSIL">
+    <Reference Include="AWSSDK, Version=2.0.8.0, Culture=neutral, PublicKeyToken=9f476d3089b52be3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\AWSSDK.1.5.0.0\lib\AWSSDK.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.2.0.8.0\lib\net45\AWSSDK.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Raven.Abstractions">
@@ -156,7 +156,6 @@
     </Compile>
     <Compile Include="Models\Center.cs" />
     <Compile Include="Models\Attachments.cs" />
-    <Compile Include="Models\Crypto.cs" />
     <Compile Include="Models\FolderProtoContain.cs" />
     <Compile Include="Models\FileProtoContain.cs" />
     <Compile Include="Models\Folder.cs" />

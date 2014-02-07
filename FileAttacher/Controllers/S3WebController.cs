@@ -10,6 +10,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Configuration;
+using System.Collections.Specialized;
 
 //Access Key ID: AKIAJY7P52OON5I3GMOA
 //Secret Access Key: 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
@@ -19,30 +21,36 @@ namespace FileAttacher.Controllers
     public class S3WebController : Controller
     {
         // hardcoded for proto
-        string AWSKeyID = "AKIAJY7P52OON5I3GMOA";
-        string AWSAccessKey = "HXDEZBPjKVCANqO9n/5By1P3vQtQRKxkhb8Asb7v";
+        //string AWSKeyID = "AKIAJY7P52OON5I3GMOA";
+        //string AWSAccessKey = "HXDEZBPjKVCANqO9n/5By1P3vQtQRKxkhb8Asb7v";
+        //NameValueCollection appSettings = ConfigurationManager.AppSettings; // get ID and KEY for S3
+        string awsAccessKey = "AKIAJY7P52OON5I3GMOA";//ConfigurationManager.AppSettings[0];
+        string awsSecretKey = "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";//ConfigurationManager.AppSettings[1];
+
         //
         // GET: /S3Web/
         public FineUploaderResult UploadFile(FineUpload upload, string extraParam1, string extraParam2)
         {
-            // new Crypto object here?
-            Crypto crypt = new Crypto();
 
             string S3FileName = Guid.NewGuid().ToString();
 
             try
             {
-                AmazonS3 client; // wasn't getting recognized.. use IAmazonS3 for >= v2.0
-                using (client = Amazon.AWSClientFactory.CreateAmazonS3Client(AWSKeyID, AWSAccessKey))
-                {
-                    
-                    Stream s = crypt.Encrypt( 0, upload.InputStream); 
 
-                    PutObjectRequest request = new PutObjectRequest();
-                    request.WithBucketName("OneCareFileAttacher")
-                   .WithCannedACL(S3CannedACL.PublicRead)
-                   .WithKey(S3FileName).InputStream = s;// upload.InputStream 
-                    S3Response response = client.PutObject(request);
+                IAmazonS3 client;
+                using (client = new AmazonS3Client(awsAccessKey, awsSecretKey, Amazon.RegionEndpoint.USEast1))
+                {
+
+                    PutObjectRequest request = new PutObjectRequest()
+                    {
+                        BucketName = "OneCareFileAttacher",
+                        Key = S3FileName,
+                        //FilePath = filePath || stream here
+                        InputStream = upload.InputStream,
+                        CannedACL = S3CannedACL.PublicRead,
+                    };
+                   
+                    PutObjectResponse response = client.PutObject(request);
                 }
             }
             catch (Exception ex)
@@ -58,17 +66,16 @@ namespace FileAttacher.Controllers
         [HttpGet]
         public ActionResult GetFile(string FileName, string S3FileName)
         {
-            // init crypto here?
-            Crypto crypt = new Crypto();
 
-            //string S3FileName = Guid.NewGuid().ToString();
             byte[] contents = new byte[16 * 1024];
             try
             {
-                AmazonS3 client = Amazon.AWSClientFactory.CreateAmazonS3Client(AWSKeyID, AWSAccessKey);
+                IAmazonS3 client = new AmazonS3Client(awsAccessKey, awsSecretKey, Amazon.RegionEndpoint.USEast1);
 
                 GetObjectRequest request = new GetObjectRequest()
-                    .WithBucketName("OneCareFileAttacher").WithKey(S3FileName);
+                {
+                    BucketName = "OneCareFileAttacher"
+                };
 
                 using (GetObjectResponse response = client.GetObject(request))
                 {
@@ -83,9 +90,7 @@ namespace FileAttacher.Controllers
                         {
                             ms.Write(buffer, 0, read); 
                         }
-                        // decrpyt here?
-                        byte[] xData = ms.ToArray();
-                        contents = crypt.Decrypt(0, xData);
+                        contents = ms.ToArray();
                     }
                 }
             }
