@@ -14,6 +14,7 @@ using System.Configuration;
 using System.Collections.Specialized;
 using Amazon.S3.Encryption;
 using System.Security.Cryptography;
+using System.IO.Compression;
 
 
 namespace FileAttacher.Controllers
@@ -54,15 +55,34 @@ namespace FileAttacher.Controllers
                 using (client = new AmazonS3EncryptionClient(awsAccessKey, awsSecretKey, cryptoClientConfig, getRSAEncrypt()))
                 {
 
-                    PutObjectRequest request = new PutObjectRequest()
+                    // compress if applicable
+                    if (ReturnExtension(Path.GetExtension(upload.Filename)).StartsWith("text") || ReturnExtension(Path.GetExtension(upload.Filename)).StartsWith("application")) // edge cases?
                     {
-                        BucketName = "OneCareFileAttacher",
-                        Key = S3FileName,
-                        InputStream = upload.InputStream,
-                        CannedACL = S3CannedACL.PublicRead,
-                    };
-                   
-                    PutObjectResponse response = client.PutObject(request);
+                        // set position of input stream to 0
+                        upload.InputStream.Position = 0;
+
+                        PutObjectRequest request = new PutObjectRequest()
+                        {
+                            BucketName = "OneCareFileAttacher",
+                            Key = S3FileName,
+                            InputStream = new MemoryStream(Compress(upload.InputStream)),
+                            CannedACL = S3CannedACL.PublicRead,
+                        };
+
+                        PutObjectResponse response = client.PutObject(request);
+                    }
+                    else
+                    {
+                        PutObjectRequest request = new PutObjectRequest()
+                        {
+                            BucketName = "OneCareFileAttacher",
+                            Key = S3FileName,
+                            InputStream = upload.InputStream,
+                            CannedACL = S3CannedACL.PublicRead,
+                        };
+
+                        PutObjectResponse response = client.PutObject(request);
+                    }
                 }
             }
             catch (Exception ex)
@@ -114,7 +134,20 @@ namespace FileAttacher.Controllers
                             {
                                 ms.Write(buffer, 0, read); 
                             }
-                            contents = ms.ToArray();
+
+                            Response.ContentType = ReturnExtension(Path.GetExtension(FileName));
+                            // compress if appropriate
+                            if(Response.ContentType.StartsWith("text") || Response.ContentType.StartsWith("application"))
+                            {
+                                // set position of stream to 0
+                                ms.Position = 0;
+                                // compress stream
+                                contents = Decompress(ms.ToArray());
+                            }
+                            else
+                            {
+                                contents = ms.ToArray();
+                            }
                         }
                     }
                 }
@@ -131,10 +164,35 @@ namespace FileAttacher.Controllers
                 FileDownloadName = FileName
             };
 
-            Response.ContentType = ReturnExtension(Path.GetExtension(FileName));
 
             return result;
         }
+
+        #region Compress/Decompress
+        private byte[] Compress(Stream input)
+        {
+            using (var compressedStream = new MemoryStream())
+            using (var zipStream = new GZipStream(compressedStream, CompressionMode.Compress))
+            {
+                input.CopyTo(zipStream);
+                zipStream.Close();
+                return compressedStream.ToArray();
+            }
+        }
+
+        private byte[] Decompress(byte[] data)
+        {
+            var output = new MemoryStream();
+            using (var compressedStream = new MemoryStream(data))
+            using (var zipStream = new GZipStream(compressedStream, CompressionMode.Decompress))
+            {
+                zipStream.CopyTo(output);
+                zipStream.Close();
+                output.Position = 0;
+                return output.ToArray();
+            }
+        }
+        #endregion
 
         private string ReturnExtension(string fileExtension)
         {
