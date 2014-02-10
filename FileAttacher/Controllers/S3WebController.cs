@@ -12,6 +12,8 @@ using System.Web;
 using System.Web.Mvc;
 using System.Configuration;
 using System.Collections.Specialized;
+using Amazon.S3.Encryption;
+using System.Security.Cryptography;
 
 //Access Key ID: AKIAJY7P52OON5I3GMOA
 //Secret Access Key: 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
@@ -20,15 +22,22 @@ namespace FileAttacher.Controllers
 {
     public class S3WebController : Controller
     {
-        // hardcoded for proto
-        //string AWSKeyID = "AKIAJY7P52OON5I3GMOA";
-        //string AWSAccessKey = "HXDEZBPjKVCANqO9n/5By1P3vQtQRKxkhb8Asb7v";
-        //NameValueCollection appSettings = ConfigurationManager.AppSettings; // get ID and KEY for S3
-        string awsAccessKey = "AKIAJY7P52OON5I3GMOA";//ConfigurationManager.AppSettings[0];
-        string awsSecretKey = "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";//ConfigurationManager.AppSettings[1];
 
-        //
-        // GET: /S3Web/
+        // set in Web.config
+        string awsAccessKey = ConfigurationManager.AppSettings[4];
+        string awsSecretKey = ConfigurationManager.AppSettings[5];
+
+        private EncryptionMaterials getRSAEncrypt()
+        {
+            string filePath = @"C:\dev\PrivateKey.txt";
+            string privateKey = System.IO.File.ReadAllText(filePath);
+            RSA rsaAlgorithm = RSA.Create();
+            rsaAlgorithm.FromXmlString(privateKey);
+            EncryptionMaterials materials = new EncryptionMaterials(rsaAlgorithm);
+
+            return materials;
+        }
+
         public FineUploaderResult UploadFile(FineUpload upload, string extraParam1, string extraParam2)
         {
 
@@ -37,15 +46,20 @@ namespace FileAttacher.Controllers
             try
             {
 
-                IAmazonS3 client;
-                using (client = new AmazonS3Client(awsAccessKey, awsSecretKey, Amazon.RegionEndpoint.USEast1))
+                AmazonS3EncryptionClient client;
+                AmazonS3CryptoConfiguration cryptoClientConfig = new AmazonS3CryptoConfiguration()
+                {
+                    ServiceURL = "s3.amazonaws.com",
+                    RegionEndpoint = Amazon.RegionEndpoint.USEast1
+                }; // config 
+
+                using (client = new AmazonS3EncryptionClient(awsAccessKey, awsSecretKey, cryptoClientConfig, getRSAEncrypt()))
                 {
 
                     PutObjectRequest request = new PutObjectRequest()
                     {
                         BucketName = "OneCareFileAttacher",
                         Key = S3FileName,
-                        //FilePath = filePath || stream here
                         InputStream = upload.InputStream,
                         CannedACL = S3CannedACL.PublicRead,
                     };
@@ -70,29 +84,43 @@ namespace FileAttacher.Controllers
             byte[] contents = new byte[16 * 1024];
             try
             {
-                IAmazonS3 client = new AmazonS3Client(awsAccessKey, awsSecretKey, Amazon.RegionEndpoint.USEast1);
 
-                GetObjectRequest request = new GetObjectRequest()
+                IAmazonS3 client;
+                AmazonS3CryptoConfiguration cryptoClientConfig = new AmazonS3CryptoConfiguration()
                 {
-                    BucketName = "OneCareFileAttacher"
-                };
+                    ServiceURL = "s3.amazonaws.com",
+                    RegionEndpoint = Amazon.RegionEndpoint.USEast1
+                }; // config 
 
-                using (GetObjectResponse response = client.GetObject(request))
+                using(client = new AmazonS3EncryptionClient(awsAccessKey, awsSecretKey, cryptoClientConfig, getRSAEncrypt()))
                 {
-                    string title = response.Metadata["x-amz-meta-title"];
-                    Console.WriteLine("The object's title is {0}", title);
 
-                    byte[] buffer = new byte[16 * 1024];
-                    using (MemoryStream ms = new MemoryStream())
+                    GetObjectRequest request = new GetObjectRequest()
                     {
-                        int read;
-                        while ((read = response.ResponseStream.Read(buffer, 0, buffer.Length)) > 0)
+                        BucketName = "OneCareFileAttacher",
+                        Key = S3FileName
+                    };
+
+                    using (GetObjectResponse response = client.GetObject(request))
+                    {
+                        string title = response.Metadata["x-amz-meta-title"];
+                        Console.WriteLine("The object's title is {0}", title);
+
+                        byte[] buffer = new byte[16 * 1024];
+
+                        using (MemoryStream ms = new MemoryStream())
                         {
-                            ms.Write(buffer, 0, read); 
+
+                            int read;
+                            while ((read = response.ResponseStream.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                ms.Write(buffer, 0, read); 
+                            }
+                            contents = ms.ToArray();
                         }
-                        contents = ms.ToArray();
                     }
                 }
+                
             }
             catch (Exception)
             {
