@@ -15,8 +15,6 @@ using System.Collections.Specialized;
 using Amazon.S3.Encryption;
 using System.Security.Cryptography;
 
-//Access Key ID: AKIAJY7P52OON5I3GMOA
-//Secret Access Key: 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
 
 namespace FileAttacher.Controllers
 {
