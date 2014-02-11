@@ -55,6 +55,7 @@ ul {margin-bottom:0px}
 }
 .header-cat {
     margin: 15px 0px 10px;
+    line-height: 45px;
 }
 .icon-file {
     margin-right: 15px;
@@ -63,18 +64,14 @@ ul {margin-bottom:0px}
     margin-left:10px;
     margin-bottom: 0px;
 }
-.file-controls {
-    line-height:40px;
-}
-#appContent.file-controls {
-    margin-top:10px;
-}
+
 .main-cat {
     font-family: inherit;
     line-height: 20px;
-    color: #bbb;
+    color: #999;
     text-rendering: optimizelegibility;
-    font-size: 20.5px;
+    font-size: 12px;
+    margin-top:15px;
 }
 #emptyTableView {
     margin-top:45px;
@@ -111,7 +108,22 @@ ul {margin-bottom:0px}
 #careNav {
     min-height: 1000px;
     margin-left:0px;
-    background: #92aab3;
+    background: #647a82;
+}
+
+#careNav .profile-block {
+    min-height: 175px;
+    background: #27a1da;
+    padding-top:20px;
+}
+
+#careNav .profile-pic {
+    border-radius: 50%;
+    behavior: url(PIE.htc); /* remove if you don't care about IE8 */
+    margin-left:70px;
+    width: 125px;
+    height: 125px;
+    background: #ccd7db;
 }
 
 .navbar .brand {

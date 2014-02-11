@@ -1,23 +1,30 @@
-﻿<style>
-    
-</style>
-
+﻿
 <div id="ViewModel">
     <div class="container">
         <div class="row-fluid" >
 
             <div id="careNav" class="span3 fix-height">
+                <div class="profile-block">
+                    <div class="profile-pic">
+
+                    </div>
+                </div>
                 <!--<p>STATIC COL SPAN3</p>-->
             </div>
 
             <div id="appContent" class="span9 fix-height">
-                <div class="header-cat">
-                    <span class="span4 main-cat">Files - Discharge Notes</span>
-                    <span class="offset3 file-controls">
+                <div class="header-cat row-fluid">
+                    <span class="span3 main-cat">FILES - DISCHARGE NOTES</span>
+                    <span class="offset3 span5 file-controls">
                         <i title="New File" data-placement="top" data-bind="click:ModalViewModel.showModal" class="icon-file"></i>
+
                         <i title="New Folder" data-placement="top" data-bind="click:$root.MainViewModel.showFolderInput" class="icon-folder-open"></i>
                         <input type="text" class="input-medium" id="newFolderInput" data-bind="visible:$root.MainViewModel.createNewFolder, value:$root.MainViewModel.newFolderName" />
-                        <i data-bind="visible:$root.MainViewModel.createNewFolder, click:$root.MainViewModel.createFolder" class="icon-plus"></i>
+                        <button class="btn btn-mini btn-info btn-info" data-bind="visible:$root.MainViewModel.createNewFolder, click:$root.MainViewModel.createFolder">
+                            <i id="addFolderIcon" class="icon-plus icon-white"></i>
+                        </button>
+                    </span>
+                    <span class="span4 file-controls">
                     </span>
                 </div>
 
@@ -88,7 +95,7 @@
         <div id="fine-uploader"></div>
         <div class="modal-footer">
             <a href="#" class="btn" data-bind="click:close,html:closeLabel"></a>
-            <a href="#" class="btn btn-primary" data-bind="click:action,html:primaryLabel"></a>
+            <a href="#" class="btn btn-info" data-bind="click:action,html:primaryLabel"></a>
         </div>
     </script>        
 
