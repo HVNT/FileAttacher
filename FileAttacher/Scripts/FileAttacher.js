@@ -3,6 +3,10 @@ viewModel.MainViewModel = new MainViewModel();
 viewModel.ModalViewModel = new ModalViewModel();
 
 $(document).ready(function () {
+    
+    var mainContainer = $('#mainContainer')
+    var appContent = $('#appContent');
+    var tableContainer = $("#table-container");
 
     /* tooltips for icons */
     $(function () {
@@ -10,62 +14,90 @@ $(document).ready(function () {
         $('.icon-folder-open').tooltip();
         $('.icon-download-alt').tooltip();
     });
+    /* disable selection on certain items to enhance UX */
+    // aka we don't want shit highlighting everywhere when I click to drag/select etc
+    $("ul, li, i").disableSelection();
 
     /* DRAGGABLE */
-    var table = $('table'); // get table
+    var draggableFiles = $(".files-body");
+    var draggableFolders = $(".folders-body");
 
-    table.find('tr td.name-col').bind('mousedown', function () {
-        table.disableSelection();
-    }).bind('mouseup', function () {
-        table.enableSelection()
-    });
-
-    table.draggable({
-        helper: dragHelper,
+    draggableFiles.draggable({
+        helper: fileDragHelper,
         cursorAt: {
             top: 0,
             left: 0,
-            right: 20,
-            bottom: 0
+            right: 35,
+            bottom: 0,
         },
-        opacity: .95,
-        containment: table, // contain draggable el to table
+        opacity: .85,
+        containment: mainContainer,
     });
-    
-    function dragHelper(event) {
-        return $('<div class="drag-table-item"><table></table></div>').find('table').append($(event.target).closest('td.name-col').clone()).end().appendTo('body');
+
+    function fileDragHelper() {
+        var z = $(event.target).closest('li').find('.name-col');
+        return $('<div class="drag-table-item"><i class="icon-file"></i>' + z.text() + '</div>');
     };
+    
+    draggableFolders.draggable({
+        helper: folderDragHelper,
+        cursorAt: {
+            top: 0,
+            left: 0,
+            right: 35,
+            bottom: 0,
+        },
+        opacity: .85,
+        containment: mainContainer,
+    });
+
+    function folderDragHelper() {
+        var z = $(event.target).closest('li').find('.name-col');
+        return $('<div class="drag-table-item"><i class="icon-folder-close"></i>' + z.text() + '</div>');
+    }
 
     /* DROPPABLE */
-    $('#Table1#droppable tr').droppable({
-        //accept: 'table',
+    draggableFolders.droppable({
+        activeClass: onPickUp,
         drop: onDrop,
-        over: onHover,
-        out: onExit
+        over: onFolderHover,
+        out: onFolderHoverExit,
     });
 
-    function onDrop(event, ui) {
-        //console.log(ui.helper[0].innerText);
+    function onPickUp() {
+        console.log('pickedup!');
+
+        // highlight rows that you can drop folder in
+    }
+
+    function onDrop() {
+        console.log('dropped!');
         
-        var target = $(event.target.context);
-        console.log(target);
+        // check if dropped over folder && !this.folder
+        // get id of folder
 
-        var folder = $(".folder");
+        // get id
+        // ajax to ctrl with new folder location and curr file to be moved
 
-        var folderIcon = $(".folder td i");
-        folderIcon.removeClass("icon-folder-open");
-        folderIcon.addClass("icon-folder-close");
+        /*
+            CONTROLLER: 
+                find currLocation of file about to be moved
+                set temp to file/folder thats about to be moved
+                delete file at currLocation
+                find new folder location
+                put temp file at this location
+                save async()
+        */
     }
 
-    function onHover(event, ui) {
-        console.log("FUCK");
-
-        var folderIcon = $(".folder td i");
-        folderIcon.removeClass("icon-folder-close");
-        folderIcon.addClass("icon-folder-open");
+    function onFolderHover() {
+        console.log('hovering!');
     }
 
-    function onExit() {
+    // find closest icon-folder-close and set to open
+
+    function onFolderHoverExit() {
+        console.log('exit');
 
     }
 
