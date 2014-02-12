@@ -8,6 +8,8 @@ $(document).ready(function () {
     var appContent = $('#appContent');
     var tableContainer = $("#table-container");
 
+    var draggableItems = $("#table-item-container");
+
     /* tooltips for icons */
     $(function () {
         $('.icon-file').tooltip();
@@ -20,10 +22,14 @@ $(document).ready(function () {
 
     /* DRAGGABLE */
     var draggableFiles = $(".files-body");
-    var draggableFolders = $(".folders-body");
+    var droppableFolders = $(".folders-body");
 
-    draggableFiles.draggable({
-        helper: fileDragHelper,
+    $('.table-item-container ul li').on("hover", function () {
+        $(this).addClass('highlight-droppables')
+    });
+
+    draggableItems.draggable({
+        helper: itemDragHelper,
         cursorAt: {
             top: 0,
             left: 0,
@@ -34,30 +40,14 @@ $(document).ready(function () {
         containment: mainContainer,
     });
 
-    function fileDragHelper() {
+    function itemDragHelper() {
         var z = $(event.target).closest('li').find('.name-col');
-        return $('<div class="drag-table-item"><i class="icon-file"></i>' + z.text() + '</div>');
+        return z.hasClass("folder") ? $('<div class="drag-table-item"><i class="icon-folder-close"></i>' + z.text() + '</div>') : 
+            $('<div class="drag-table-item"><i class="icon-file"></i>' + z.text() + '</div>');
     };
-    
-    draggableFolders.draggable({
-        helper: folderDragHelper,
-        cursorAt: {
-            top: 0,
-            left: 0,
-            right: 35,
-            bottom: 0,
-        },
-        opacity: .85,
-        containment: mainContainer,
-    });
-
-    function folderDragHelper() {
-        var z = $(event.target).closest('li').find('.name-col');
-        return $('<div class="drag-table-item"><i class="icon-folder-close"></i>' + z.text() + '</div>');
-    }
 
     /* DROPPABLE */
-    draggableFolders.droppable({
+    draggableItems.droppable({
         activeClass: onPickUp,
         drop: onDrop,
         over: onFolderHover,
@@ -67,7 +57,7 @@ $(document).ready(function () {
     function onPickUp() {
         console.log('pickedup!');
 
-        // highlight rows that you can drop folder in
+        $('.folders-body').removeClass('icon-folder-close');
     }
 
     function onDrop() {
@@ -103,3 +93,43 @@ $(document).ready(function () {
 
     ko.applyBindings(viewModel);
 });
+
+
+
+
+/*
+draggableFiles.draggable({
+    helper: fileDragHelper,
+    cursorAt: {
+        top: 0,
+        left: 0,
+        right: 35,
+        bottom: 0,
+    },
+    opacity: .85,
+    containment: mainContainer,
+});
+
+function fileDragHelper() {
+    var z = $(event.target).closest('li').find('.name-col');
+    return $('<div class="drag-table-item"><i class="icon-file"></i>' + z.text() + '</div>');
+};
+
+
+draggableFolders.draggable({
+    helper: folderDragHelper,
+    cursorAt: {
+        top: 0,
+        left: 0,
+        right: 35,
+        bottom: 0,
+    },
+    opacity: .85,
+    containment: mainContainer,
+});
+
+function folderDragHelper() {
+    var z = $(event.target).closest('li').find('.name-col');
+    return $('<div class="drag-table-item"><i class="icon-folder-close"></i>' + z.text() + '</div>');
+}
+*/

@@ -174,3 +174,7 @@ ul.col-heads {
 .file-icon-span {
     padding-left:15px;
 }
+
+.highlight-droppables {
+    background: #eef8fc;
+}

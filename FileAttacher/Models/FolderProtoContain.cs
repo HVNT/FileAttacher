@@ -9,6 +9,6 @@ namespace FileAttacher.Models
     {
         public string centerIndex { get; set; }
         public Guid folderID { get; set; }
-        public Folder newfolder { get; set; }
+        public Folder newfolder { get; set; } // also use to move files by using a folders fileatt list
     }
 }
