@@ -47,7 +47,7 @@ $(document).ready(function () {
     };
 
     /* DROPPABLE */
-    draggableItems.droppable({
+    droppableFolders.droppable({
         activeClass: onPickUp,
         drop: onDrop,
         over: onFolderHover,

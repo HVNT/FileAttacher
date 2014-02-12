@@ -102,6 +102,12 @@ namespace FileAttacher
                 defaults: new { Controller = "Folder", Action = "RemoveFolder" },
                 constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
                 );
+            routes.MapHttpRoute(
+                name: "MoveFileApi",
+                routeTemplate: "api/v1/Folder/MoveFile",
+                defaults: new { Controller = "Folder", Action = "MoveFile" },
+                constraints: new { httpMethod = new HttpMethodConstraint(new[] { "GET", "POST" }) }
+                );
         }
     }
 }

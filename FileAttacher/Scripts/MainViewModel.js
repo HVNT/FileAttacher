@@ -164,5 +164,36 @@
         });
     }
 
+    /*
+     * Move file from currFolder to newFolder
+     */
+    self.moveFile = function (sourceFolderID, fileToMoveID, destFolderID) {
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            dataType: "json",
+            url: "/api/v1/FileAtt/MoveFile",
+            data: JSON.stringify({ // correct structure?
+                centerIndex: careCenterID,
+                currFolderID: sourceFolderID,
+                newfolder: {
+                    targetFolderID: destFolderID,
+                    FileAtts: [
+                        {g: fileToMoveID}
+                    ]
+                }
+            }),
+            success: function (data) {
+                console.log(data);
+                //.. give some response like a delay fade to show delete
+                // remove from ui, put at new ui? how can we refresh ui hurr;
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+    }
+
     self.pageLoad(); // load page
 }
