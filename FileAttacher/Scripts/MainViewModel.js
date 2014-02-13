@@ -180,7 +180,7 @@
                 newfolder: {
                     targetFolderID: destFolderID,
                     FileAtts: [
-                        {g: fileToMoveID}
+                        { g: fileToMoveID }
                     ]
                 }
             }),

@@ -46,7 +46,7 @@
                     <div id="table-item-container">
                         <!-- Folder(s) table body-->
                         <ul class="unstyled folders-body" data-bind="foreach: $root.MainViewModel.folders, visible: ($root.MainViewModel.folders().length > 0)">
-                            <li class="row-fluid">
+                            <li class="row-fluid" data-bind="attr: { id: g}">
                                 <span class="span1 folder-icon-span"><i data-bind="visible: MimeType == 'folder', click:$root.MainViewModel.navIn" class="icon-folder-close"></i></span>
                                 <span class="span5 folder name-col" data-bind="text: Filename, click:$root.MainViewModel.navIn"></span>
                                 <span class="span3" data-bind="text: MimeType"></span>
@@ -56,7 +56,7 @@
                         </ul>
                         <!-- File(s) table body -->
                         <ul class="unstyled files-body" data-bind="foreach: $root.MainViewModel.files, visible: ($root.MainViewModel.files().length > 0)">
-                            <li class="row-fluid list-col">
+                            <li class="row-fluid list-col file-container" data-bind="attr: { id: g}">
                                 <span class="span1 file-icon-span">
                                     <a id="imgblow" data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + g }">
                                         <i data-bind="click:$root.MainViewModel.showImage, visible: MimeType == 'image/jpeg'" class="icon-fullscreen"></i>
