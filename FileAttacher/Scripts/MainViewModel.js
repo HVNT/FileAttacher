@@ -41,7 +41,7 @@
             console.log("..at rootFolder");
         } else {
             self.data.pop(); // pop old
-            
+
             self.currFolderId(self.data()[self.data().length - 1].g);
             self.files(self.data()[self.data().length - 1].FileAtts);
             self.folders(self.data()[self.data().length - 1].Folders);
@@ -183,6 +183,8 @@
                 self.currFolderId(data.g); // set to guid of rootFolder on load
                 self.files(data.FileAtts); // set view files
                 self.folders(data.Folders); // set view folders
+
+
                 //!
                 dragDrop().go();
             },
@@ -217,6 +219,8 @@
                 success: function (data) {
                     console.log(data);
                     self.folders.push(data);
+                    //!
+                    dragDrop().go();
                 },
                 error: function (data) {
                     console.log(data);
@@ -279,25 +283,39 @@
      */
     self.moveFile = function (sourceFolderID, fileToMoveID, destFolderID) {
 
+        var folder = {
+            g: destFolderID,
+            MimeType: "folder",
+            FileAtts: [
+                { g: fileToMoveID }
+            ],
+            Folders: [],
+        }
+
         $.ajax({
             type: "POST",
             contentType: "application/json",
             dataType: "json",
-            url: "/api/v1/FileAtt/MoveFile",
+            url: "/api/v1/Folder/MoveFile",
             data: JSON.stringify({ // correct structure?
                 centerIndex: careCenterID,
-                currFolderID: sourceFolderID,
-                newfolder: {
-                    targetFolderID: destFolderID,
-                    FileAtts: [
-                        { g: fileToMoveID }
-                    ]
-                }
+                folderID: sourceFolderID(),
+                newfolder: folder
             }),
             success: function (data) {
                 console.log(data);
                 //.. give some response like a delay fade to show delete
                 // remove from ui, put at new ui? how can we refresh ui hurr;
+                var files = self.files();
+                console.log(files);
+                ko.utils.arrayForEach(files, function (file) {
+                    if (file.g == fileToMoveID) {
+                        //self.files.remove(file);
+                    }
+                    else {
+                        console.log("I can't find the file to remove from view");
+                    }
+                });
             },
             error: function (data) {
                 console.log(data);

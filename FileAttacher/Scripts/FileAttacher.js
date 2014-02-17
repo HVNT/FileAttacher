@@ -1,7 +1,8 @@
 ﻿
+var viewModel = {};
+
 $(document).ready(function () {
 
-    var viewModel = {};
     viewModel.MainViewModel = new MainViewModel();
     viewModel.ModalViewModel = new ModalViewModel();
 

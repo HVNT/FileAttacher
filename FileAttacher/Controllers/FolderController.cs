@@ -257,9 +257,19 @@ namespace FileAttacher.Controllers
                 Center careCenter = await session.LoadAsync<Center>(cID); // load care center given ID
                 Folder temp = careCenter.RootFolder;
                 Folder current = null;
+                
+                
 
                 Queue<Folder> q = new Queue<Folder>(); // dfs
                 q.Enqueue(temp); // put root on top
+
+                //quick check to see if current folder is root
+                if (temp.g == currFolderID)
+                {
+                    oldFolder = temp;
+                    // h4ck.. dequeue to make count = 0 to skip while loop
+                    q.Dequeue();
+                }
 
                 while (q.Count > 0) // while folders remain
                 {
@@ -321,7 +331,7 @@ namespace FileAttacher.Controllers
 
                         foreach (var folder in _current.Folders)
                         {
-                            if (folder.g == currFolderID) // folder found!
+                            if (folder.g == targetFolderID) // folder found!
                             {
                                 _targetFolder = folder; // get folder ref
                                 break; // break foreach if found
@@ -335,7 +345,7 @@ namespace FileAttacher.Controllers
                         {
                             foreach (var folder in _current.Folders) // add all current avail folders to queue
                             {
-                                q.Enqueue(folder);
+                                _q.Enqueue(folder);
                             }
                         }
                     }
@@ -350,7 +360,7 @@ namespace FileAttacher.Controllers
                     }
 
                     await session.SaveChangesAsync(); // save changes
-                    result.Value = "successful move of file " + fileToMove.Filename + " to folder " + _targetFolder.Filename;
+                    result.Value = "successful move of file " + fileToMove.g + " to folder " + _targetFolder.Filename;
                 }
             }
 

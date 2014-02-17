@@ -51,7 +51,7 @@ function ModalViewModel() {
 
     self.fileAttachs = []; // modal fileAtts arr
 
-    self.showModal = function (root) {
+    self.showModal = function () {
 
         self.modal.show(true);
         /* Bind FineUploader to modal view */
@@ -89,8 +89,8 @@ function ModalViewModel() {
     self.onModalAction = function () {
 
         var fArr = self.fileAttachs;
-        var fID = viewModel.MainViewModel.currFolderId()
-        
+        var fID = viewModel.MainViewModel.currFolderId();
+
         $.ajax({
             type: "POST",
             contentType: "application/json",
