@@ -84,6 +84,7 @@
 
             var files = self.files();
             var folders = self.folders();
+            var itemToMove = null;
 
             if (files.length > 0) {
                 ko.utils.arrayForEach(files, function (file) {
@@ -92,8 +93,12 @@
 
                         if (_f !== undefined) {
                             $(_f).draggable({
-                                helper: itemDragHelper,
-                                cursor: "pointer",
+                                helper: function () {
+                                    itemToMove = file;
+                                    var z = $(event.target).closest('li').find('.name-col');
+                                    return z.hasClass("folder") ? $('<span class="drag-table-item"><i class="icon-folder-close"></i>' + z.text() + '</span>') :
+                                        $('<span class="drag-table-item"><i class="icon-file"></i>' + z.text() + '</span>');
+                                }, cursor: "pointer",
                                 cursorAt: { top: 0, left: 0, right: 25, bottom: 0 },
                                 opacity: .95,
                                 containment: mainContainer,
@@ -110,7 +115,12 @@
 
                         //set draggable
                         $(_f).draggable({
-                            helper: itemDragHelper,
+                            helper: function () {
+                                itemToMove = folder;
+                                var z = $(event.target).closest('li').find('.name-col');
+                                return z.hasClass("folder") ? $('<span class="drag-table-item"><i class="icon-folder-close"></i>' + z.text() + '</span>') :
+                                    $('<span class="drag-table-item"><i class="icon-file"></i>' + z.text() + '</span>');
+                            },
                             cursor: "pointer",
                             cursorAt: { top: 0, left: 0, right: 25, bottom: 0 },
                             opacity: .95,
@@ -120,13 +130,22 @@
                         //set droppable
                         $(_f).droppable({
                             //activeClass: onPickUp,
-                            drop: onDrop,
+                            drop: function () {
+                                if (itemToMove !== null) {
+                                    console.log(folder.Filename);
+                                    //folder.g = target droppable
+                                    self.moveFile(self.currFolderId, itemToMove.g, folder.g);
+                                }
+                                else {
+                                    console.log("itemToMove is null");
+                                }
+                            },
                             //over: onFolderHover,
                             //out: onFolderHoverExit,
                         });
 
                         //set hover
-                        var _hover = $('#' + folder.g + ' i');
+                        var _hover = $('#' + folder.g + ' i.icon-folder-close');
                         _hover.mouseenter(function () {
                             $(this).removeClass('icon-folder-close');
                             $(this).addClass('icon-folder-open');
@@ -139,23 +158,12 @@
             }
         }
 
-        /* HELPERS */
-        function itemDragHelper() {
-            var z = $(event.target).closest('li').find('.name-col');
-            return z.hasClass("folder") ? $('<span class="drag-table-item"><i class="icon-folder-close"></i>' + z.text() + '</span>') :
-                $('<span class="drag-table-item"><i class="icon-file"></i>' + z.text() + '</span>');
-        };
-
-        function onDrop() {
-            console.log('onDrop');
-        };
-
         /* INIT */
         $self.go = function () {
+            itemToMove = null;
             set();
         }
 
-        // self.update
         return $self;
     };
 
