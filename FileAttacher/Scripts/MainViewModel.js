@@ -45,6 +45,9 @@
             self.currFolderId(self.data()[self.data().length - 1].g);
             self.files(self.data()[self.data().length - 1].FileAtts);
             self.folders(self.data()[self.data().length - 1].Folders);
+
+            // update drag/drop
+            dragDrop().go();
         }
     }
 
@@ -57,6 +60,9 @@
         self.currFolderId(self.data()[self.data().length - 1].g); // set to guid of rootFolder on load
         self.files(self.data()[self.data().length - 1].FileAtts); // set view files
         self.folders(self.data()[self.data().length - 1].Folders); // set view folders
+
+        // update drag/drop
+        dragDrop().go();
     }
 
     
@@ -74,109 +80,63 @@
         var $self = this;
 
         /* SETTERS */
-        function setDrags() {
-            
-
-            var temp = [];
-            var curr = [];
+        function set() {
 
             var files = self.files();
             var folders = self.folders();
 
-            ko.utils.arrayForEach(files, function (file) {
+            if (files.length > 0) {
+                ko.utils.arrayForEach(files, function (file) {
+                    if (file !== undefined) {
+                        var _f = $('#' + file.g);
 
-                if (file !== undefined) {
-                    // send through jquery constructor and set draggable
-                    var _f = $('#' + file.g);
-                    console.log(_f);
+                        if (_f !== undefined) {
+                            $(_f).draggable({
+                                helper: itemDragHelper,
+                                cursor: "pointer",
+                                cursorAt: { top: 0, left: 0, right: 25, bottom: 0 },
+                                opacity: .95,
+                                containment: mainContainer,
+                            });
+                        }
+                    }
+                });
+            }
 
-                    if (_f !== undefined) {
+            if (folders.length > 0) {
+                ko.utils.arrayForEach(folders, function (folder) {
+                    if (folder !== undefined) {
+                        var _f = $('#' + folder.g);
+
+                        //set draggable
                         $(_f).draggable({
                             helper: itemDragHelper,
-                            cursorAt: {
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                bottom: 0,
-                            },
-                            opacity: .85,
+                            cursor: "pointer",
+                            cursorAt: { top: 0, left: 0, right: 25, bottom: 0 },
+                            opacity: .95,
                             containment: mainContainer,
                         });
+
+                        //set droppable
+                        $(_f).droppable({
+                            //activeClass: onPickUp,
+                            drop: onDrop,
+                            //over: onFolderHover,
+                            //out: onFolderHoverExit,
+                        });
+
+                        //set hover
+                        var _hover = $('#' + folder.g + ' i');
+                        _hover.mouseenter(function () {
+                            $(this).removeClass('icon-folder-close');
+                            $(this).addClass('icon-folder-open');
+                        }).mouseleave(function () {
+                            $(this).addClass('icon-folder-close');
+                            $(this).removeClass('icon-folder-open');
+                        })
                     }
-                }
-            });
-
-            ko.utils.arrayForEach(folders, function (folder) {
-                var _f = $('#' + folder.g);
-                console.log(_f);
-
-                $(_f).draggable({
-                    helper: itemDragHelper,
-                    cursorAt: {
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                    },
-                    opacity: .85,
-                    containment: mainContainer,
                 });
-            });
-
-            /*
-            while (temp.length > 0) {
-                curr = temp.pop();
-
-                //cast to jquery, droppable all files/folders, then add folders to queue
-                if (!(curr[0] === undefined) && curr[0].FileAtts.length > 0) {
-                    ko.utils.arrayForEach(curr[0].FileAtts, function (file) {
-                        // send through jquery constructor and set draggable
-                        $(file).draggable({
-                            helper: itemDragHelper,
-                            cursorAt: {
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                bottom: 0,
-                            },
-                            opacity: .85,
-                            containment: mainContainer,
-                        });
-                    });
-                }
-                
-                if (!(curr[0] === undefined) && curr[0].Folders.length > 0) {
-                    ko.utils.arrayForEach(curr[0].Folders, function (folder) {
-                        temp.push(folder); // push to queue to continue dfs
-                        // send through jquery constructor and set draggable
-                        $(folder).draggable({
-                            helper: itemDragHelper,
-                            cursorAt: {
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                bottom: 0,
-                            },
-                            opacity: .85,
-                            containment: mainContainer,
-                        });
-                    });
-                }
             }
-            */
-
-            // dfs over array
-            // cast to jquery object on each node visit
-            // set draggable
-            
-        }
-
-        function setDrops() {
-
-            // dfs over array
-            // cast to jquery object on each node visit
-            // set droppable
-
         }
 
         /* HELPERS */
@@ -186,10 +146,13 @@
                 $('<span class="drag-table-item"><i class="icon-file"></i>' + z.text() + '</span>');
         };
 
+        function onDrop() {
+            console.log('onDrop');
+        };
+
         /* INIT */
-        $self.init = function () {
-            setDrags();
-            setDrops();
+        $self.go = function () {
+            set();
         }
 
         // self.update
@@ -213,7 +176,7 @@
                 self.files(data.FileAtts); // set view files
                 self.folders(data.Folders); // set view folders
                 //!
-                dragDrop().init();
+                dragDrop().go();
             },
             error: function (data) {
                 console.log(data);
