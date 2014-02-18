@@ -155,9 +155,13 @@
                             //activeClass: onPickUp,
                             drop: function () {
                                 if (itemToMove !== null) {
-                                    console.log(folder.Filename);
-                                    //folder.g = target droppable
-                                    self.moveFile(self.currFolderId, itemToMove.g, folder.g);
+                                    if (itemToMove.MimeType === "folder") {
+                                        self.moveFolder(self.currFolderId(), itemToMove.g, folder.g);
+                                    }
+                                    else {
+                                        //folder.g = target droppable
+                                        self.moveFile(self.currFolderId(), itemToMove.g, folder.g);
+                                    }
                                 }
                                 else {
                                     console.log("itemToMove is null");
@@ -326,7 +330,7 @@
             url: "/api/v1/Folder/MoveFile",
             data: JSON.stringify({ // correct structure?
                 centerIndex: careCenterID,
-                folderID: sourceFolderID(),
+                folderID: sourceFolderID,
                 newfolder: folder
             }),
             success: function (data) {
@@ -363,6 +367,74 @@
                     // move file from view and navIn
                     self.navInWFile($folder, $file);
                 }
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+    }
+
+    /*
+     * Move file from currFolder to newFolder
+     */
+    self.moveFolder = function (sourceFolderID, folderToMoveID, destFolderID) {
+        console.log(sourceFolderID);
+
+        var folder = {
+            g: destFolderID,
+            MimeType: "folder",
+            Folders: [
+                { g: folderToMoveID }
+            ],
+            folderToMoveID: [],
+        }
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            dataType: "json",
+            url: "/api/v1/Folder/MoveFolder",
+            data: JSON.stringify({ // correct structure?
+                centerIndex: careCenterID,
+                folderID: sourceFolderID,
+                newfolder: folder
+            }),
+            success: function (data) {
+                console.log("werk");
+                /*
+                var files = self.files();
+                var $file = null;
+
+                ko.utils.arrayForEach(files, function (file) {
+
+                    if (file.g == fileToMoveID) {
+                        // get file
+                        $file = file;
+                        // get curr folder
+                        var $data = self.data()[self.data().length - 1].FileAtts;
+                        console.log($data);
+                    }
+                });
+
+                var folders = self.folders();
+                var $folder = null;
+
+                ko.utils.arrayForEach(folders, function (folder) {
+
+                    if (folder.g == destFolderID) {
+                        // get destination folder
+                        $folder = folder;
+                    }
+                });
+
+                if ($file === null) {
+                    console.log("I can't find the file to remove from view");
+                }
+                else {
+                    // move file from view and navIn
+                    self.navInWFile($folder, $file);
+                }
+                */
             },
             error: function (data) {
                 console.log(data);

@@ -108,10 +108,13 @@ namespace FileAttacher.Controllers
 
                     foreach (var folder in current.Folders)
                     {
-                        if (folder.g == folderID) // folder found!
+                        if(folder != null)
                         {
-                            targetFolder = folder; // get folder ref
-                            break; // break foreach if found
+                            if (folder.g == folderID) // folder found!
+                            {
+                                targetFolder = folder; // get folder ref
+                                break; // break foreach if found
+                            }
                         }
                     }
                     if (targetFolder!=null)
@@ -120,9 +123,12 @@ namespace FileAttacher.Controllers
                     }
                     else // !found
                     {
-                        foreach (var folder in current.Folders) // add all current avail folders to queue
+                        if(current.Folders.Count > 0)
                         {
-                            q.Enqueue(folder);
+                            foreach (var folder in current.Folders) // add all current avail folders to queue
+                            {
+                                q.Enqueue(folder);
+                            }
                         }
                     }
                 }
@@ -187,10 +193,13 @@ namespace FileAttacher.Controllers
 
                     foreach (var folder in current.Folders)
                     {
-                        if (folder.g == folderID) // folder found!
+                        if (folder != null)
                         {
-                            targetFolder = folder; // get folder ref
-                            break; // break foreach if found
+                            if (folder.g == folderID) // folder found!
+                            {
+                                targetFolder = folder; // get folder ref
+                                break; // break foreach if found
+                            }
                         }
                     }
                     if (targetFolder != null)
@@ -199,9 +208,12 @@ namespace FileAttacher.Controllers
                     }
                     else // !found
                     {
-                        foreach (var folder in current.Folders) // add all current avail folders to queue
+                        if (current.Folders.Count > 0)
                         {
-                            q.Enqueue(folder);
+                            foreach (var folder in current.Folders) // add all current avail folders to queue
+                            {
+                                q.Enqueue(folder);
+                            }
                         }
                     }
                 }
@@ -289,9 +301,13 @@ namespace FileAttacher.Controllers
                     }
                     else // !found
                     {
-                        foreach (var folder in current.Folders) // add all current avail folders to queue
+                        if (current.Folders.Count > 0)
                         {
-                            q.Enqueue(folder);
+                            foreach (var folder in current.Folders) // add all current avail folders to queue
+                            {
+
+                                q.Enqueue(folder);
+                            }
                         }
                     }
                 }
@@ -307,13 +323,164 @@ namespace FileAttacher.Controllers
 
                     foreach (var file in oldFolder.FileAtts)
                     {
-                        if (file.g == fileToMoveID) // file found!
+                        if(file != null)
                         {
-                            // get ref of file so we can remove from currFolder
-                            fileToMove = file;
+                            if (file.g == fileToMoveID) // file found!
+                            {
+                                // get ref of file so we can remove from currFolder
+                                fileToMove = file;
 
-                            // remove file at currLocation so we can move it
-                            oldFolder.FileAtts.Remove(file);
+                                // remove file at currLocation so we can move it
+                                oldFolder.FileAtts.Remove(file);
+                                break; // break foreach if found
+                            }
+                        }
+                    }
+                    // now find the folder we are moving  the file too
+                    Folder _targetFolder = null;
+                    Folder _temp = careCenter.RootFolder;
+                    Folder _current = null;
+
+                    Queue<Folder> _q = new Queue<Folder>(); // dfs
+                    _q.Enqueue(temp); // put root on top
+
+                    while (_q.Count > 0) // while folders remain
+                    {
+                        _current = _q.Dequeue();
+
+                        foreach (var folder in _current.Folders)
+                        {
+                            if(folder != null)
+                            {
+                                if (folder.g == targetFolderID) // folder found!
+                                {
+                                    _targetFolder = folder; // get folder ref
+                                    break; // break foreach if found
+                                }
+                            }
+                        }
+                        if (_targetFolder != null)
+                        {
+                            break; // if found break while loop
+                        }
+                        else // !found
+                        {
+                            if(_current.Folders.Count > 0)
+                            {
+                                foreach (var folder in _current.Folders) // add all current avail folders to queue
+                                {
+                                    _q.Enqueue(folder);
+                                }
+                            }
+                        }
+                    }
+                    if (_targetFolder == null) // shit
+                    {
+                        result.AddError("No Folder found to add to", "under that guid uhoh.");
+                        return result;
+                    }
+                    else // all good, targetFolder to move new file to was found
+                    {
+                        _targetFolder.FileAtts.Add(fileToMove); // add file
+                    }
+
+                    await session.SaveChangesAsync(); // save changes
+                    result.Value = "successful move of file " + fileToMove.g + " to folder " + _targetFolder.Filename;
+                }
+            }
+
+            return result;
+        }
+
+        [HttpGet, HttpPost]
+        public async Task<HttpResponseMessage> MoveFolder(FolderProtoContain data)
+        {
+            string cID = data.centerIndex;
+            Guid currFolderID = data.folderID;
+            Guid folderToMoveID = data.newfolder.Folders[0].g;
+            Guid targetFolderID = data.newfolder.g;
+
+            var result = await MoveF(cID, currFolderID, folderToMoveID, targetFolderID);
+
+            if (!result.IsValid)
+                return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);
+
+            return RequestMessage.CreateResponse(HttpStatusCode.OK, result.Value); //result.Value = id removed
+        }
+
+        private async Task<Result> MoveF(string cID, Guid currFolderID, Guid folderToMoveID, Guid targetFolderID)
+        {
+            var result = new Result();
+
+            if (String.IsNullOrEmpty(cID)) // have more handlers here
+            {
+                result.AddError("No centerID", "centerID required for removal");
+                return result;
+            }
+
+            using (var session = RavenApiController.DocumentStore.OpenAsyncSession())
+            {
+                Folder oldFolder = null;
+                Center careCenter = await session.LoadAsync<Center>(cID); // load care center given ID
+                Folder temp = careCenter.RootFolder;
+                Folder current = null;
+
+
+
+                Queue<Folder> q = new Queue<Folder>(); // dfs
+                q.Enqueue(temp); // put root on top
+
+                //quick check to see if current folder is root
+                if (temp.g == currFolderID)
+                {
+                    oldFolder = temp;
+                    // h4ck.. dequeue to make count = 0 to skip while loop
+                    q.Dequeue();
+                }
+
+                while (q.Count > 0) // while folders remain
+                {
+                    current = q.Dequeue();
+
+                    foreach (var folder in current.Folders)
+                    {
+                        if (folder.g == currFolderID) // folder found!
+                        {
+                            oldFolder = folder; // get folder ref
+                            break; // break foreach if found
+                        }
+                    }
+                    if (oldFolder != null)
+                    {
+                        break; // if found break while loop
+                    }
+                    else // !found
+                    {
+                        foreach (var folder in current.Folders) // add all current avail folders to queue
+                        {
+                            q.Enqueue(folder);
+                        }
+                    }
+                }
+
+                if (oldFolder == null) // shit
+                {
+                    result.AddError("No Folder found to add to", "under that guid uhoh.");
+                    return result;
+                }
+                else // all good, targetFolder to delete was found
+                {
+                    Folder folderToMove = null;
+
+                    foreach (var folder in oldFolder.Folders)
+                    {
+                        if (folder.g == folderToMoveID) // file found!
+                        {
+                            // get ref of folder so we can remove from currFolder
+                            folderToMove = folder;
+
+                            // remove folder at currLocation so we can move it
+                            oldFolder.Folders.Remove(folder);
                             break; // break foreach if found
                         }
                     }
@@ -354,13 +521,13 @@ namespace FileAttacher.Controllers
                         result.AddError("No Folder found to add to", "under that guid uhoh.");
                         return result;
                     }
-                    else // all good, targetFolder to move new file to was found
+                    else // all good, targetFolder to move new folder to was found
                     {
-                        _targetFolder.FileAtts.Add(fileToMove); // add file
+                        _targetFolder.Folders.Add(folderToMove); // add folder
                     }
 
                     await session.SaveChangesAsync(); // save changes
-                    result.Value = "successful move of file " + fileToMove.g + " to folder " + _targetFolder.Filename;
+                    result.Value = "successful move of file " + folderToMove.g + " to folder " + _targetFolder.Filename;
                 }
             }
 

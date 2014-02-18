@@ -181,10 +181,13 @@ namespace FileAttacher.Controllers
 
                     foreach (var folder in current.Folders)
                     {
-                        if (folder.g == folderId) // folder found!
+                        if (folder != null)
                         {
-                            targetFolder = folder; // get folder ref
-                            break; // break foreach if found
+                            if (folder.g == folderId) // folder found!
+                            {
+                                targetFolder = folder; // get folder ref
+                                break; // break foreach if found
+                            }
                         }
                     }
                     if(f != null) 
@@ -193,9 +196,12 @@ namespace FileAttacher.Controllers
                     }
                     else // !found
                     {
-                        foreach (var folder in current.Folders) // add all current avail folders to queue
+                        if (current.Folders.Count > 0)
                         {
-                            q.Enqueue(folder);
+                            foreach (var folder in current.Folders) // add all current avail folders to queue
+                            {
+                                q.Enqueue(folder);
+                            }
                         }
                     }
                 }
