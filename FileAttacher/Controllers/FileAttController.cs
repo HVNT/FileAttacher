@@ -63,10 +63,13 @@ namespace FileAttacher.Controllers
 
                     foreach (var file in current.FileAtts)
                     {
-                        if (file.g == fileID) // file found!
+                        if (file != null)
                         {
-                            f = file; // get file ref
-                            break; // break foreach if found
+                            if (file.g == fileID) // file found!
+                            {
+                                f = file; // get file ref
+                                break; // break foreach if found
+                            }
                         }
                     }
                     if(f != null) 
@@ -75,9 +78,12 @@ namespace FileAttacher.Controllers
                     }
                     else // !found
                     {
-                        foreach (var folder in current.Folders) // add all current avail folders to queue
+                        if(current.Folders.Count > 0)
                         {
-                            q.Enqueue(folder);
+                            foreach (var folder in current.Folders) // add all current avail folders to queue
+                            {
+                                q.Enqueue(folder);
+                            }
                         }
                     }
                 }

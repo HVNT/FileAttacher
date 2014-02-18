@@ -100,6 +100,7 @@ function ModalViewModel() {
             success: function () {
                 fArr.forEach(function (file) {
                     viewModel.MainViewModel.files.push(file);
+                    viewModel.MainViewModel.dragDrop().go();
                 });
             },
             error: function (data) {

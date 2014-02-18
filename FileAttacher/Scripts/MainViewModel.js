@@ -55,11 +55,34 @@
      * On click : nav in by rootFolder
      */
     self.navIn = function (folder) {
+        console.log(folder);
+        
         self.data.push(folder); // push new 
 
         self.currFolderId(self.data()[self.data().length - 1].g); // set to guid of rootFolder on load
         self.files(self.data()[self.data().length - 1].FileAtts); // set view files
         self.folders(self.data()[self.data().length - 1].Folders); // set view folders
+
+        // update drag/drop
+        dragDrop().go();
+    }
+
+    /*
+     * On fileMove 
+     */
+    self.navInWFile = function (folder, fileMove) {
+        // remove fileMove from source folder
+   //   self.data()[self.data().length - 1].FileAtts.splice(
+   //       self.data()[self.data().length - 1].FileAtts.indexOf(fileMove), fileMove); 
+
+        self.data.push(folder); // push new 
+
+        self.currFolderId(self.data()[self.data().length - 1].g); // set to guid of rootFolder on load
+        self.files(self.data()[self.data().length - 1].FileAtts); // set view files
+        self.folders(self.data()[self.data().length - 1].Folders); // set view folders
+
+        // push fileMove
+        self.files.push(fileMove);
 
         // update drag/drop
         dragDrop().go();
@@ -88,10 +111,10 @@
 
             if (files.length > 0) {
                 ko.utils.arrayForEach(files, function (file) {
-                    if (file !== undefined) {
+                    if (file != undefined) {
                         var _f = $('#' + file.g);
 
-                        if (_f !== undefined) {
+                        if (_f != undefined) {
                             $(_f).draggable({
                                 helper: function () {
                                     itemToMove = file;
@@ -110,7 +133,7 @@
 
             if (folders.length > 0) {
                 ko.utils.arrayForEach(folders, function (folder) {
-                    if (folder !== undefined) {
+                    if (folder != undefined) {
                         var _f = $('#' + folder.g);
 
                         //set draggable
@@ -167,6 +190,11 @@
         return $self;
     };
 
+    // mini h4ck to get dragDrop in ModalViewModel scope..
+    // in implementation won't matter because dragdrop will be
+    // encapsulated independently
+    self.dragDrop = dragDrop;
+
     /////////////////////////////////////////////////////////
     //////////////********** ACTIONS ***********/////////////
     /////////////////////////////////////////////////////////
@@ -183,7 +211,6 @@
                 self.currFolderId(data.g); // set to guid of rootFolder on load
                 self.files(data.FileAtts); // set view files
                 self.folders(data.Folders); // set view folders
-
 
                 //!
                 dragDrop().go();
@@ -303,19 +330,39 @@
                 newfolder: folder
             }),
             success: function (data) {
-                console.log(data);
-                //.. give some response like a delay fade to show delete
-                // remove from ui, put at new ui? how can we refresh ui hurr;
+
                 var files = self.files();
-                console.log(files);
+                var $file = null;
+
                 ko.utils.arrayForEach(files, function (file) {
+
                     if (file.g == fileToMoveID) {
-                        //self.files.remove(file);
-                    }
-                    else {
-                        console.log("I can't find the file to remove from view");
+                        // get file
+                        $file = file;
+                        // get curr folder
+                        var $data = self.data()[self.data().length - 1].FileAtts;
+                        console.log($data);
                     }
                 });
+
+                var folders = self.folders();
+                var $folder = null;
+
+                ko.utils.arrayForEach(folders, function (folder) {
+
+                    if (folder.g == destFolderID) {
+                        // get destination folder
+                        $folder = folder;
+                    }
+                });
+
+                if ($file === null) {
+                    console.log("I can't find the file to remove from view");
+                }
+                else {
+                    // move file from view and navIn
+                    self.navInWFile($folder, $file);
+                }
             },
             error: function (data) {
                 console.log(data);
