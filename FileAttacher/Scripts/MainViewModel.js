@@ -71,9 +71,14 @@
      * On fileMove 
      */
     self.navInWFile = function (folder, fileMove) {
-        // remove fileMove from source folder
-   //   self.data()[self.data().length - 1].FileAtts.splice(
-   //       self.data()[self.data().length - 1].FileAtts.indexOf(fileMove), fileMove); 
+        // remove folderToMove from view before push
+        ko.utils.arrayForEach(self.data()[self.data().length - 1].FileAtts, function (idx) {
+            if (idx.g == fileMove.g) {
+                var files = self.data()[self.data().length - 1].FileAtts;
+                var idxF = files.indexOf(idx);
+                files.splice(idxF, 1);
+            }
+        });
 
         self.data.push(folder); // push new 
 
@@ -88,7 +93,32 @@
         dragDrop().go();
     }
 
-    
+    /*
+     * On folderMove 
+     */
+    self.navInWFolder = function (folder, folderToMove) {
+        // remove folderToMove from view before push
+        ko.utils.arrayForEach(self.data()[self.data().length - 1].Folders, function (idx) {
+            if (idx.g == folderToMove.g) {
+                var folders = self.data()[self.data().length - 1].Folders;
+                var idxF = folders.indexOf(idx);
+                folders.splice(idxF, 1);
+            }
+        });
+
+        self.data.push(folder); // push new 
+
+        self.currFolderId(self.data()[self.data().length - 1].g); // set to guid of rootFolder on load
+        self.files(self.data()[self.data().length - 1].FileAtts); // set view files
+        self.folders(self.data()[self.data().length - 1].Folders); // set view folders
+
+        // push folderMove
+        self.folders.push(folderToMove);
+
+        // update drag/drop
+        dragDrop().go();
+    }
+
     /////////////////////////////////////////////////////////
     /////////////********** DRAG/DROP ***********////////////
     /////////////////////////////////////////////////////////
@@ -334,18 +364,13 @@
                 newfolder: folder
             }),
             success: function (data) {
-
                 var files = self.files();
                 var $file = null;
 
                 ko.utils.arrayForEach(files, function (file) {
-
                     if (file.g == fileToMoveID) {
                         // get file
                         $file = file;
-                        // get curr folder
-                        var $data = self.data()[self.data().length - 1].FileAtts;
-                        console.log($data);
                     }
                 });
 
@@ -353,7 +378,6 @@
                 var $folder = null;
 
                 ko.utils.arrayForEach(folders, function (folder) {
-
                     if (folder.g == destFolderID) {
                         // get destination folder
                         $folder = folder;
@@ -400,41 +424,33 @@
                 newfolder: folder
             }),
             success: function (data) {
-                console.log("werk");
-                /*
-                var files = self.files();
-                var $file = null;
+                var folders = self.folders();
+                var folderToMove = null;
 
-                ko.utils.arrayForEach(files, function (file) {
-
-                    if (file.g == fileToMoveID) {
+                ko.utils.arrayForEach(folders, function (folder) {
+                    if (folder.g == folderToMoveID) {
                         // get file
-                        $file = file;
-                        // get curr folder
-                        var $data = self.data()[self.data().length - 1].FileAtts;
-                        console.log($data);
+                        folderToMove = folder;
                     }
                 });
 
                 var folders = self.folders();
                 var $folder = null;
 
-                ko.utils.arrayForEach(folders, function (folder) {
-
-                    if (folder.g == destFolderID) {
+                ko.utils.arrayForEach(folders, function (f) {
+                    if (f.g == destFolderID) {
                         // get destination folder
-                        $folder = folder;
+                        $folder = f;
                     }
                 });
 
-                if ($file === null) {
-                    console.log("I can't find the file to remove from view");
+                if (folderToMove === null) {
+                    console.log("I can't find the folder to remove from view");
                 }
                 else {
                     // move file from view and navIn
-                    self.navInWFile($folder, $file);
+                    self.navInWFolder($folder, folderToMove);
                 }
-                */
             },
             error: function (data) {
                 console.log(data);

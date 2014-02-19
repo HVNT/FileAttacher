@@ -49,46 +49,55 @@ function ModalViewModel() {
         }
     }
 
-    self.fileAttachs = []; // modal fileAtts arr
-
     self.showModal = function () {
+
+        self.fileAttachs = ko.observableArray(); // modal fileAtts arr
 
         self.modal.show(true);
         /* Bind FineUploader to modal view */
         $('#fine-uploader').fineUploader({
-            debug: true,
             request: {
                 endpoint: 'S3Web/UploadFile'
             }
         }).on('complete', function (event, id, name, responseJSON) {
-            /*
-            (event) // jQuery.event
-            (id) // index in S3??
-            (name) // lemur.jpg
-            (responseJSON) // {S3FileName: "240eadf5-ec49-4d02-93ea-a3a5404f28f7", success: true}
-            */
             if (responseJSON.success) {
-                console.log(responseJSON);
-                self.fileAttachs.push(
-                    {
-                        g: responseJSON.S3FileName,
-                        MimeType : '', // set on server side on save
-                        Filename: name,
-                        Extension: name.slice(name.indexOf('.'), name.length)
-                    });
-            } else {
+                // trust me i know this is ridiculous.. but it works so screw it for now
+                var _file = {
+                    g: responseJSON.S3FileName,
+                    MimeType : '', // set on server side on save
+                    Filename: name,
+                    Extension: name.slice(name.indexOf('.'), name.length)
+                }
+                console.log(self.fileAttachs());
+                if (self.fileAttachs().length < 1) {
+                    self.fileAttachs.push(_file)
+                }
+                
+                var alreadyPresent = false;
+                self.fileAttachs().forEach(function (file) {
+                    if (_file.g == file.g) {
+                        alreadyPresent = true;
+                        //break?
+                    }
+                });
+                if (!alreadyPresent) {
+                    self.fileAttachs.push(_file)
+                }
+            }
+            else {
                 console.log('There was an error with FineUploader');
             }
         });
     }
 
     self.onModalClose = function () {
-        self.fileAttachs = [];
+        console.log("i just closed");
+        self.fileAttachs.removeAll();
     }
 
     self.onModalAction = function () {
 
-        var fArr = self.fileAttachs;
+        console.log("i just actioned");
         var fID = viewModel.MainViewModel.currFolderId();
 
         $.ajax({
@@ -96,18 +105,21 @@ function ModalViewModel() {
             contentType: "application/json",
             dataType: "json",
             url: "/api/v1/FileAtt/SaveUploads",
-            data: JSON.stringify({ centerIndex: careCenterID, ID: fID, FileAtts: fArr }), // file guid
+            data: JSON.stringify({ centerIndex: careCenterID, ID: fID, FileAtts: self.fileAttachs() }), // file guid
             success: function () {
-                fArr.forEach(function (file) {
+
+                self.fileAttachs().forEach(function (file) {
                     viewModel.MainViewModel.files.push(file);
                     viewModel.MainViewModel.dragDrop().go();
                 });
+                self.fileAttachs.removeAll(); // clear 
+                console.log(self.fileAttachs());
             },
             error: function (data) {
                 console.log(data);
+                self.fileAttachs.removeAll(); // clear 
             }
         });
 
-        self.fileAttachs = []; // clear 
     }
 }
