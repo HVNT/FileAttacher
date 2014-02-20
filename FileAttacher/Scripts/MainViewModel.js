@@ -119,6 +119,34 @@
         dragDrop().go();
     }
 
+    /*
+     * On click/drop: navTo
+     * 
+     * This is really an navBack X times, because only option is to go back
+     */
+    self.navTo = function (folder) {
+        console.log(folder);
+
+        if (self.data().length <= 1) { // at root .. DO NOT POP ROOT
+            // ONDROP move file/folder to $root
+            console.log("..at rootFolder");
+        } else {
+
+            console.log(self.data().indexOf(folder));
+
+            self.data.splice(self.data().indexOf(folder) + 1);
+            console.log(self.data());
+
+
+            self.files(self.data()[self.data().length - 1].FileAtts);
+            self.folders(self.data()[self.data().length - 1].Folders);
+
+            // update drag/drop
+            //dragDrop().go();
+        }
+    }
+     
+
     /////////////////////////////////////////////////////////
     /////////////********** DRAG/DROP ***********////////////
     /////////////////////////////////////////////////////////
@@ -137,6 +165,7 @@
 
             var files = self.files();
             var folders = self.folders();
+            var breadcrumbs = self.data();
             var itemToMove = null;
 
             if (files.length > 0) {
@@ -184,7 +213,7 @@
                         $(_f).droppable({
                             //activeClass: onPickUp,
                             drop: function () {
-                                if (itemToMove !== null) {
+                                if (itemToMove != undefined) {
                                     if (itemToMove.MimeType === "folder") {
                                         self.moveFolder(self.currFolderId(), itemToMove.g, folder.g);
                                     }
@@ -213,10 +242,37 @@
                     }
                 });
             }
+
+            if (breadcrumbs.length > 0) {
+                ko.utils.arrayForEach(breadcrumbs, function (crumb) {
+                    if (crumb != undefined) {
+                        var _f = $('#' + crumb.g);
+                        
+                        $(_f).droppable({
+                            //activeClass: onPickUp,
+                            drop: function () {
+                                if (itemToMove != undefined) {
+                                    if (itemToMove.MimeType === "folder") {
+                                        self.moveFolder(self.currFolderId(), itemToMove.g, crumb.g);
+                                    }
+                                    else {
+                                        //folder.g = target droppable
+                                        self.moveFile(self.currFolderId(), itemToMove.g, crumb.g);
+                                    }
+                                }
+                                else {
+                                    console.log("itemToMove is null");
+                                }
+                            },
+                        });
+                    }
+                });
+            }
         }
 
         /* INIT */
         $self.go = function () {
+
             itemToMove = null;
             set();
         }
@@ -332,6 +388,7 @@
                 console.log(data);
                 //.. give some response like a delay fade to show delete
                 self.files.remove(f);
+                
             },
             error: function (data) {
                 console.log(data);
@@ -402,7 +459,6 @@
      * Move file from currFolder to newFolder
      */
     self.moveFolder = function (sourceFolderID, folderToMoveID, destFolderID) {
-        console.log(sourceFolderID);
 
         var folder = {
             g: destFolderID,

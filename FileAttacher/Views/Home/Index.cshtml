@@ -24,8 +24,14 @@
                             <i id="addFolderIcon" class="icon-plus icon-white"></i>
                         </button>
                     </span>
-                    <span class="span4 file-controls">
-                    </span>
+                </div>
+                <div class="folder-nav row-fluid">
+                    <ul class="breadcrumb" data-bind="foreach: $root.MainViewModel.data">
+                        <li data-bind="attr: {id: g}">
+                            <span class="crumb" data-bind=" css: { inactive : $index() == $root.MainViewModel.data().length - 1 }, text: Filename, click: $root.MainViewModel.navTo"></span>
+                            <span class="divider">/</span>
+                        </li>
+                    </ul>
                 </div>
 
                 <!-- File(s) table -->
@@ -59,7 +65,7 @@
                             <li class="row-fluid list-col file-container" data-bind="attr: { id: g}">
                                 <span class="span1 file-icon-span">
                                     <a id="imgblow" data-bind="attr: { href: '/S3Web/GetFile?FileName=' + Filename + '&S3FileName=' + g }">
-                                        <i data-bind="click:$root.MainViewModel.showImage, visible: MimeType == 'image/jpeg'" class="icon-fullscreen"></i>
+                                        <i data-bind="click:$root.MainViewModel.showImage, visible: MimeType.substring(0,5) == 'image'" class="icon-fullscreen"></i>
                                     </a>
                                 </span>
                                 <span class="span5 name-col" data-bind="text: Filename"></span>

@@ -1,6 +1,8 @@
 ﻿body {
     padding-top: 40px;
     padding-bottom: 20px;
+
+    font-family: "Source Sans Pro"
 }
 
 a:hover p {
@@ -70,7 +72,7 @@ ul {margin-bottom:0px}
     line-height: 20px;
     color: #999;
     text-rendering: optimizelegibility;
-    font-size: 12px;
+    font-size: 15px;
     margin-top:15px;
 }
 #emptyTableView {
@@ -105,6 +107,22 @@ ul {margin-bottom:0px}
     padding-top: 20px;
     padding-right: 20px;
     min-height:500px;
+}
+
+.folder-nav ul {
+    padding:8px 0px;
+    margin-bottom:10px;
+    font-size:18px;
+}
+
+.folder-nav .crumb {
+    color:#0088cc;
+    cursor:pointer; 
+}
+
+.folder-nav .inactive {
+    color:#999;
+    cursor: default;
 }
 
 .fix-height {

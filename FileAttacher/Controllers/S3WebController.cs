@@ -89,10 +89,10 @@ namespace FileAttacher.Controllers
             {
                 return new FineUploaderResult(false, error: ex.Message);
             }
-
-            string MimeType = ReturnExtension(upload.Filename);
+            //hackity hack to get mimetype on S3 post
+            string MimeType = ReturnExtension(upload.Filename.Substring(upload.Filename.IndexOf(".")));
             // the anonymous object in the result below will be convert to json and set back to the browser
-            return new FineUploaderResult(true, new { S3FileName = S3FileName }); //, new { MimeType = MimeType }
+            return new FineUploaderResult(true, new { S3FileName = S3FileName , MimeType = MimeType}); //, new { MimeType = MimeType }
         }
 
         [HttpGet]

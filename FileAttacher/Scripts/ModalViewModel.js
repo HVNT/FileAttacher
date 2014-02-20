@@ -64,11 +64,11 @@ function ModalViewModel() {
                 // trust me i know this is ridiculous.. but it works so screw it for now
                 var _file = {
                     g: responseJSON.S3FileName,
-                    MimeType : '', // set on server side on save
+                    MimeType : responseJSON.MimeType, // set on server side on save
                     Filename: name,
                     Extension: name.slice(name.indexOf('.'), name.length)
                 }
-                console.log(self.fileAttachs());
+                console.log(responseJSON);
                 if (self.fileAttachs().length < 1) {
                     self.fileAttachs.push(_file)
                 }
@@ -106,14 +106,13 @@ function ModalViewModel() {
             dataType: "json",
             url: "/api/v1/FileAtt/SaveUploads",
             data: JSON.stringify({ centerIndex: careCenterID, ID: fID, FileAtts: self.fileAttachs() }), // file guid
-            success: function () {
-
+            success: function (data) {
                 self.fileAttachs().forEach(function (file) {
+                    console.log(file);
                     viewModel.MainViewModel.files.push(file);
                     viewModel.MainViewModel.dragDrop().go();
                 });
                 self.fileAttachs.removeAll(); // clear 
-                console.log(self.fileAttachs());
             },
             error: function (data) {
                 console.log(data);
@@ -121,5 +120,6 @@ function ModalViewModel() {
             }
         });
 
+        viewModel.MainViewModel.showImage();
     }
 }
