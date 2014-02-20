@@ -213,7 +213,7 @@
                         $(_f).droppable({
                             //activeClass: onPickUp,
                             drop: function () {
-                                if (itemToMove != undefined) {
+                                if (itemToMove != null) {
                                     if (itemToMove.MimeType === "folder") {
                                         self.moveFolder(self.currFolderId(), itemToMove.g, folder.g);
                                     }
@@ -231,14 +231,14 @@
                         });
 
                         //set hover
-                        var _hover = $('#' + folder.g + ' i.icon-folder-close');
+                        var _hover = $('#' + folder.g + ' .drop-zone');
                         _hover.mouseenter(function () {
-                            $(this).removeClass('icon-folder-close');
-                            $(this).addClass('icon-folder-open');
+                            $('#' + folder.g + ' i.closed').removeClass('icon-folder-close');
+                            $('#' + folder.g + ' i.closed').addClass('icon-folder-open');
                         }).mouseleave(function () {
-                            $(this).addClass('icon-folder-close');
-                            $(this).removeClass('icon-folder-open');
-                        })
+                            $('#' + folder.g + ' i.closed').removeClass('icon-folder-open');
+                            $('#' + folder.g + ' i.closed').addClass('icon-folder-close');
+                        });
                     }
                 });
             }
