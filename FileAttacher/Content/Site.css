@@ -75,6 +75,10 @@ ul {margin-bottom:0px}
     font-size: 15px;
     margin-top:15px;
 }
+
+.breadcrumb {
+    background: #FFF;
+}
 #emptyTableView {
     margin-top:45px;
     font-size:22.5px;
@@ -103,6 +107,15 @@ ul {margin-bottom:0px}
     margin-top:-1px;
     margin-right:5px;
 }
+
+.droppable-area {
+    background:#ddd;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
 #appContent {
     padding-top: 20px;
     padding-right: 20px;
@@ -118,6 +131,12 @@ ul {margin-bottom:0px}
 .folder-nav .crumb {
     color:#0088cc;
     cursor:pointer; 
+}
+
+.folder-nav .crumb:not(.inactive):hover {
+    color:#0088cc;
+    cursor:pointer; 
+    text-decoration: underline;
 }
 
 .folder-nav .inactive {

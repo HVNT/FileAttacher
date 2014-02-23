@@ -245,7 +245,15 @@ namespace FileAttacher.Controllers
             Guid fileToMoveID = data.newfolder.FileAtts[0].g;
             Guid targetFolderID = data.newfolder.g;
 
-            var result = await Move(cID, currFolderID, fileToMoveID, targetFolderID);
+            var result = new Result(); 
+            if (currFolderID != targetFolderID)
+            {
+                result = await Move(cID, currFolderID, fileToMoveID, targetFolderID);
+            }
+            else
+            {
+                result.AddError("currFolderID"," == targetFolderID");
+            }
 
             if (!result.IsValid)
                 return RequestMessage.CreateResponse(HttpStatusCode.BadRequest, result.Errors.First().Message);

@@ -39,9 +39,11 @@
                     <!-- File(s) table header -->
                     <ul class="col-heads inline row-fluid">
                         <li class="span1">
+                            <!--
                             <button class="btn btn-mini btn-info" data-bind="visible:$root.MainViewModel.data().length > 1, click:$root.MainViewModel.navBack">
                                 <i class="icon-white icon-chevron-left"></i>
                             </button>
+                            -->
                         </li>
                         <li class="span5">NAME</li>
                         <li class="span3">TYPE</li>
@@ -82,7 +84,7 @@
                 </div> <!-- End .table-container -->
                 <!-- Empty Table? Show message-->
                 <div id="emptyTableView" data-bind="visible: ($root.MainViewModel.files().length < 1 && $root.MainViewModel.folders().length < 1), click: ModalViewModel.showModal">
-                    <p class="text-center">[ADD A FILE] <br /><br /><i class="icon-file"></i></p>
+                    <p class="text-center">[ ADD A FILE ] <br /><br /><i class="icon-file"></i></p>
                 </div>
 
             </div>
