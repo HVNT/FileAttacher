@@ -109,7 +109,11 @@ ul {margin-bottom:0px}
 }
 
 .droppable-area {
-    background:#ddd;
+    background:#eee;
+}
+
+.droppable-area-hover {
+    background: #bbd9db;
 }
 
 .underline {

@@ -241,6 +241,7 @@
                                     console.log("itemToMove is null");
                                 }
                             },
+                            hoverClass: 'droppable-area-hover'
                             //over: onFolderHover,
                             //out: onFolderHoverExit,
                         });
