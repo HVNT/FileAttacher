@@ -109,7 +109,7 @@
         if (folder != null && folderToMove != null) {
             // remove folderToMove from view before push
             ko.utils.arrayForEach(self.data()[self.data().length - 1].Folders, function (idx) {
-                if (idx != null && folterToMove != null) {
+                if (idx != null && folderToMove != null) {
                     if (idx.g == folderToMove.g) {
                         var folders = self.data()[self.data().length - 1].Folders;
                         var idxF = folders.indexOf(idx);
@@ -197,7 +197,7 @@
                                         $('<span class="drag-table-item"><i class="icon-file"></i>' + z.text() + '</span>');
                                 }, cursor: "pointer",
                                 cursorAt: { top: 0, left: 0, right: 25, bottom: 0 },
-                                opacity: .95,
+                                opacity: .85,
                                 containment: mainContainer,
                             });
                         }
@@ -220,7 +220,7 @@
                             },
                             cursor: "pointer",
                             cursorAt: { top: 0, left: 0, right: 25, bottom: 0 },
-                            opacity: .95,
+                            opacity: .85,
                             containment: mainContainer,
                         });
 
