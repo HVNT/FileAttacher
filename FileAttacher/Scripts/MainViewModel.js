@@ -104,7 +104,10 @@
             console.log("..at rootFolder");
         }
         else {
+            console.log(folderDestination);
+            console.log(self.data());
             self.data.splice(self.data().indexOf(folderDestination) + 1);
+            console.log(self.data());
             self.currFolderId(self.data()[self.data().length - 1].g); 
             self.files(self.data()[self.data().length - 1].FileAtts);
             self.folders(self.data()[self.data().length - 1].Folders);
@@ -123,7 +126,7 @@
             self.currFolderId(self.data()[self.data().length - 1].g); 
             self.files(self.data()[self.data().length - 1].FileAtts);
             self.folders(self.data()[self.data().length - 1].Folders);
-            self.files.push(folderToMove); // push fileToMove to new view files
+            self.folders.push(folderToMove); // push folderToMove to new view folders
             // update drag/drop
             dragDrop().go();
         }
@@ -413,6 +416,7 @@
                     newfolder: folder
                 }),
                 success: function (data) {
+
                     var files = self.files();
                     var fileToMove = null;
                     ko.utils.arrayForEach(files, function (file) {
@@ -426,21 +430,61 @@
                         }
                     });
 
-                    var folders = self.folders();
                     var folderDestination = null;
-                    ko.utils.arrayForEach(folders, function (folder) {
-                        if (folder.g == destFolderID) {
-                            // get destination folder
-                            folderDestination = folder;
-                        }
-                    });
+                    var $root = self.data()[0];
+                    var queue = [$root];
+                    var found = false;
 
-                    if (fileToMove == null || folderDestination == null) {
-                        console.log("I can't find the file to move from view or the destination folder");
+                    // check if destination folder is root first
+                    if ($root.g == destFolderID) {
+                        folderDestination = $root;
+                        found = true;
+                    }
+
+                    while (!found) {
+                        var curr = queue.pop();
+
+                        if (curr.Folders != null) {
+
+                            curr.Folders.forEach(function (folder) {
+                                if (folder != null) {
+                                    if (folder.g == destFolderID) {
+                                        folderDestination = folder;
+                                        found = true;
+                                    }
+                                }
+                            });
+
+                            if (folderDestination != null) { // redundant?
+                                break;
+                            }
+                            else { //continue hunt for destination folder
+                                if (curr.Folders.length > 0) {
+
+                                    curr.Folders.forEach(function (folder) {
+                                        if (folder != null) {
+                                            queue.push(folder);
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }
+
+                    if (fileToMove == null) {
+                        console.log("I can't find the file to move from view");
+                    }
+                    else if (folderDestination == null) {
+                        console.log("I can't find the destination folder");
                     }
                     else {
                         // move file from view and navIn
-                        self.navInWFile(folderDestination, fileToMove);
+                        if (self.folders().indexOf(folderDestination) >= 0) {
+                            self.navInWFile(folderDestination, fileToMove);
+                        }
+                        else {
+                            self.navToWFile(folderDestination, fileToMove);
+                        }
                     }
                 },
                 error: function (data) {
@@ -475,6 +519,7 @@
                     newfolder: folder
                 }),
                 success: function (data) {
+
                     var folders = self.folders();
                     var folderToMove = null;
                     ko.utils.arrayForEach(folders, function (folder) {
@@ -485,21 +530,61 @@
                         }
                     });
 
-                    // need dfs here !
                     var folderDestination = null;
-                    ko.utils.arrayForEach(folders, function (f) {
-                        if (f.g == destFolderID) {
-                            // get destination folder
-                            folderDestination = f;
-                        }
-                    });
+                    var $root = self.data()[0]; 
+                    var queue = [$root];
+                    var found = false;
 
-                    if (folderToMove == null || folderDestination == null) {
-                        console.log("I can't find the folder to move from view or the destination folder");
+                    // check if destination folder is root first
+                    if ($root.g == destFolderID) {
+                        folderDestination = $root;
+                        found = true;
+                    }
+
+                    while (!found) {
+                        var curr = queue.pop();
+
+                        if (curr.Folders != null) {
+
+                            curr.Folders.forEach(function (folder) {
+                                if (folder != null) {
+                                    if (folder.g == destFolderID) {
+                                        folderDestination = folder;
+                                        found = true;
+                                    }
+                                }
+                            });
+
+                            if (folderDestination != null) { // redundant??
+                                break;
+                            }
+                            else { //continue hunt for destination folder
+
+                                if (curr.Folders.length > 0) {
+                                    curr.Folders.forEach(function (folder) {
+                                        if (folder != null) {
+                                            queue.push(folder);
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }
+
+                    if (folderToMove == null) {
+                        console.log("I can't find the file to move from view");
+                    }
+                    else if (!found) {
+                        console.log("I can't find the destination folder");
                     }
                     else {
-                        // move file from view and navIn
-                        self.navInWFolder(folderDestination, folderToMove);
+                        // move folder from view and navIn
+                        if (self.folders.indexOf(folderDestination) >= 0) {
+                            self.navInWFolder(folderDestination, folderToMove);
+                        }
+                        else {
+                            self.navToWFolder(folderDestination, folderToMove);
+                        }
                     }
                 },
                 error: function (data) {
