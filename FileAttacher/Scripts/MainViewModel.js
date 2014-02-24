@@ -142,6 +142,7 @@
 
         /* DECLARATIONS */
         var $self = this;
+        var itemToMove = null;
 
         /* SETTERS */
         function set() {
@@ -149,7 +150,6 @@
             var files = self.files();
             var folders = self.folders();
             var breadcrumbs = self.data();
-            var itemToMove = null;
 
             if (files.length > 0) {
                 ko.utils.arrayForEach(files, function (file) {
@@ -163,7 +163,8 @@
                                     var z = $(event.target).closest('li').find('.name-col');
                                     return z.hasClass("folder") ? $('<span class="drag-table-item"><i class="icon-folder-close"></i>' + z.text() + '</span>') :
                                         $('<span class="drag-table-item"><i class="icon-file"></i>' + z.text() + '</span>');
-                                }, cursor: "pointer",
+                                },
+                                cursor: "pointer",
                                 cursorAt: { top: 0, left: 0, right: 25, bottom: 0 },
                                 opacity: .65,
                                 containment: mainContainer,
@@ -209,7 +210,8 @@
                                     console.log("itemToMove is null");
                                 }
                             },
-                            hoverClass: 'droppable-area-hover'
+                            hoverClass: 'droppable-area-hover',
+                            tolerance: 'pointer'
                         });
 
                         //set hover
@@ -228,35 +230,36 @@
             if (breadcrumbs.length > 0) {
                 var i = 0;
                 ko.utils.arrayForEach(breadcrumbs, function (crumb) {
-                    console.log(crumb);
                     if (crumb != null) {
                         //var _f = $('li > span[id=crumb' + i + ']');
                         var _f = $("#breadcrumbs li >span");
 
                         _f.droppable({
                             activeClass: 'crumb-drop-active',
-                            drop: function () {
-
-                                var destCrumbID = _f.attr('id');
-                                if (itemToMove != null) {
-                                    if (itemToMove.MimeType === "folder") {
-                                        self.moveFolder(self.currFolderId(), itemToMove.g, destCrumbID);
-                                    }
-                                    else {
-                                        self.moveFile(self.currFolderId(), itemToMove.g, destCrumbID);
-                                    }
-                                }
-                                else {
-                                    console.log("itemToMove is null");
-                                }
-                            },
+                            drop: breadcrumbHelper,
                             hoverClass: 'crumb-drop-hover',
+                            tolerance: 'pointer'
                         });
                     }
                     i++;
                 });
             }
+    }
+
+    function breadcrumbHelper(event, ui) {
+        var destCrumbID = $(this).attr('id');
+        if (itemToMove != null) {
+            if (itemToMove.MimeType === "folder") {
+                self.moveFolder(self.currFolderId(), itemToMove.g, destCrumbID);
+            }
+            else {
+                self.moveFile(self.currFolderId(), itemToMove.g, destCrumbID);
+            }
         }
+        else {
+            console.log("itemToMove is null");
+        }
+    }
 
         /* INIT */
         $self.go = function () {
