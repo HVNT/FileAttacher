@@ -419,6 +419,7 @@
 
                     var files = self.files();
                     var fileToMove = null;
+
                     ko.utils.arrayForEach(files, function (file) {
                         if (file != null) {
                             if (file.g == fileToMoveID) {
@@ -522,12 +523,20 @@
 
                     var folders = self.folders();
                     var folderToMove = null;
+
+                    console.log(folders);
                     ko.utils.arrayForEach(folders, function (folder) {
-                        if (folder.g == folderToMoveID) {
-                            // get file
-                            folderToMove = folder;
-                            self.folders.remove(folder);
+                        if (typeof folder !== "undefined") {
+                            if (folder.g == folderToMoveID) {
+                                // get file
+                                folderToMove = folder;
+                                self.folders.remove(folder); // causing undefined? view not updated by the
+                                // time the traversal occurs?
+                            }
                         }
+                        else { // weird undefined folder getting in.. guess is remove knockout leaves empty obj
+                            console.log("undefined folder handled")
+                        };
                     });
 
                     var folderDestination = null;
@@ -547,12 +556,15 @@
                         if (curr.Folders != null) {
 
                             curr.Folders.forEach(function (folder) {
-                                if (folder != null) {
+                                if (typeof folder !== "undefined") {
                                     if (folder.g == destFolderID) {
                                         folderDestination = folder;
                                         found = true;
                                     }
                                 }
+                                else { // weird undefined folder getting in.. guess is remove knockout leaves empty obj
+                                    console.log("undefined folder handled")
+                                };
                             });
 
                             if (folderDestination != null) { // redundant??
