@@ -252,7 +252,7 @@ namespace FileAttacher.Controllers
             }
             else
             {
-                result.AddError("currFolderID"," == targetFolderID");
+                result.AddError("currFolderID", "currFolderID == targetFolderID");
             }
 
             if (!result.IsValid)
@@ -283,7 +283,7 @@ namespace FileAttacher.Controllers
                 Queue<Folder> q = new Queue<Folder>(); // dfs
                 q.Enqueue(temp); // put root on top
 
-                //quick check to see if current folder is root
+                //quick check to see if current folder is root <-- redundant?
                 if (temp.g == currFolderID)
                 {
                     oldFolder = temp;
@@ -322,7 +322,7 @@ namespace FileAttacher.Controllers
 
                 if (oldFolder == null) // shit
                 {
-                    result.AddError("No Folder found to add to", "under that guid uhoh.");
+                    result.AddError("No Folder found to remove from", "No Folder found to remove from under that guid uhoh.");
                     return result;
                 }
                 else // all good, targetFolder to delete was found
@@ -346,11 +346,19 @@ namespace FileAttacher.Controllers
                     }
                     // now find the folder we are moving  the file too
                     Folder _targetFolder = null;
-                    Folder _temp = careCenter.RootFolder;
+                    Folder _temp = careCenter.RootFolder; // redundant instantiation. refractor when time
                     Folder _current = null;
 
                     Queue<Folder> _q = new Queue<Folder>(); // dfs
                     _q.Enqueue(temp); // put root on top
+
+                    //quick check to see if destination Folder is at $root
+                    if (_temp.g == targetFolderID)
+                    {
+                        _targetFolder = temp;
+                        // h4ck.. dequeue to make count = 0 to skip while loop
+                        _q.Dequeue();
+                    }
 
                     while (_q.Count > 0) // while folders remain
                     {
@@ -384,7 +392,7 @@ namespace FileAttacher.Controllers
                     }
                     if (_targetFolder == null) // shit
                     {
-                        result.AddError("No Folder found to add to", "under that guid uhoh.");
+                        result.AddError("No Folder found to add to", "No Folder found to add to under that guid uhoh.");
                         return result;
                     }
                     else // all good, targetFolder to move new file to was found
@@ -415,7 +423,7 @@ namespace FileAttacher.Controllers
             }
             else
             {
-                result.AddError("currFolderID", " == targetFolderID");
+                result.AddError("currFolderID", "currFolderID == targetFolderID");
             }
 
 
@@ -508,6 +516,14 @@ namespace FileAttacher.Controllers
 
                     Queue<Folder> _q = new Queue<Folder>(); // dfs
                     _q.Enqueue(temp); // put root on top
+
+                    //quick check to see if destination Folder is at $root
+                    if (_temp.g == targetFolderID)
+                    {
+                        _targetFolder = temp;
+                        // h4ck.. dequeue to make count = 0 to skip while loop
+                        _q.Dequeue();
+                    }
 
                     while (_q.Count > 0) // while folders remain
                     {

@@ -28,7 +28,7 @@
                 <div class="folder-nav row-fluid">
                     <ul class="breadcrumb" id="breadcrumbs" data-bind="foreach: $root.MainViewModel.data">
                         <li>
-                            <span class="crumb" data-bind=" css: { inactive : $index() == $root.MainViewModel.data().length - 1 }, text: Filename, click: $root.MainViewModel.navTo"></span>
+                            <span class="crumb" data-bind=" css: { inactive : $index() == $root.MainViewModel.data().length - 1 }, text: Filename, click: $root.MainViewModel.navTo, attr: { id: g}"></span>
                             <span class="divider">/</span>
                         </li>
                     </ul>

@@ -34,27 +34,6 @@
     }
 
     /*
-     * On click : nav back by rootFolder
-     */
-    /*
-    self.navBack = function () {
-        if (self.data().length <= 1) { // at root .. DO NOT POP ROOT
-            // do nothing??
-            console.log("..at rootFolder");
-        } else {
-            self.data.pop(); // pop old
-
-            self.currFolderId(self.data()[self.data().length - 1].g);
-            self.files(self.data()[self.data().length - 1].FileAtts);
-            self.folders(self.data()[self.data().length - 1].Folders);
-
-            // update drag/drop
-            dragDrop().go();
-        }
-    }
-    */
-
-    /*
      * On click : nav in by rootFolder
      */
     self.navIn = function (folder) {
@@ -108,80 +87,43 @@
      * This is really an navBack X times, because only option is to go back
      */
     self.navTo = function (folderDestination) {
-        console.log(folderDestination);
-
         if (self.data().length <= 1) { // at root .. DO NOT POP ROOT
-            // ONDROP move file/folder to $root
             console.log("..at rootFolder");
         } else if (folderDestination != null) {
-
-            console.log(self.data().indexOf(folderDestination));
-
             self.data.splice(self.data().indexOf(folderDestination) + 1);
-            console.log(self.data());
-
-            self.currFolderId(self.data()[self.data().length - 1].g); // set to guid of rootFolder on load
+            self.currFolderId(self.data()[self.data().length - 1].g); 
             self.files(self.data()[self.data().length - 1].FileAtts);
             self.folders(self.data()[self.data().length - 1].Folders);
-
-            console.log(self.files());
-
             // update drag/drop
             dragDrop().go();
         }
     }
 
-    navToWFile = function (folderDestination, fileToMove) {
-        /*var $root = self.data();
-        var destination = null;
-        var queue = [$root];
-
-        //quick check to see if folderDestination is root
-        if ($root.g == folderDestination.g) {
-
-        }
-        else {
-
-            while (queue.size > 0) {
-
-                var curr = queue.pop();
-                if (curr.Folders != null) {
-
-                    curr.Folders.forEach(function (folder) {
-                        if (folder != null) {
-                            if (folder.g == folderDestination.g) {
-                                destination = folder;
-                            }
-                        }
-                    });
-
-                    if (destination != null) {
-                        break;
-                    }
-                    else { //continue hunt for destination folder
-                        curr.Folders.forEach(function (folder) {
-                            if (folder != null) {
-                                queue.push(folder);
-                            }
-                        });
-                    }
-                }
-            }
-        }*/
-
+    self.navToWFile = function (folderDestination, fileToMove) {
         if (self.data().length <= 1) {
             console.log("..at rootFolder");
         }
-
         else {
             self.data.splice(self.data().indexOf(folderDestination) + 1);
-
-            self.currFolderId(self.data()[self.data().length - 1].g); // set to guid of rootFolder on load
+            self.currFolderId(self.data()[self.data().length - 1].g); 
             self.files(self.data()[self.data().length - 1].FileAtts);
             self.folders(self.data()[self.data().length - 1].Folders);
-
             self.files.push(fileToMove); // push fileToMove to new view files
+            // update drag/drop
+            dragDrop().go();
+        }
+    }
 
+    self.navToWFolder = function (folderDestination, folderToMove) {
+        if (self.data().length <= 1) {
+            console.log("..at rootFolder");
+        }
+        else {
+            self.data.splice(self.data().indexOf(folderDestination) + 1);
+            self.currFolderId(self.data()[self.data().length - 1].g); 
+            self.files(self.data()[self.data().length - 1].FileAtts);
+            self.folders(self.data()[self.data().length - 1].Folders);
+            self.files.push(folderToMove); // push fileToMove to new view files
             // update drag/drop
             dragDrop().go();
         }
@@ -294,20 +236,19 @@
                         _f.droppable({
                             activeClass: 'crumb-drop-active',
                             drop: function () {
-                                console.log('ehy');
-                                /*
+
+                                var destCrumbID = _f.attr('id');
                                 if (itemToMove != null) {
                                     if (itemToMove.MimeType === "folder") {
-                                        self.moveFolder(self.currFolderId(), itemToMove.g, crumb.g);
+                                        self.moveFolder(self.currFolderId(), itemToMove.g, destCrumbID);
                                     }
                                     else {
-                                        //folder.g = target droppable
-                                        self.moveFile(self.currFolderId(), itemToMove.g, crumb.g);
+                                        self.moveFile(self.currFolderId(), itemToMove.g, destCrumbID);
                                     }
                                 }
                                 else {
                                     console.log("itemToMove is null");
-                                }*/
+                                }
                             },
                             hoverClass: 'crumb-drop-hover',
                         });
@@ -472,11 +413,13 @@
                     var files = self.files();
                     var fileToMove = null;
                     ko.utils.arrayForEach(files, function (file) {
-                        if (file.g == fileToMoveID) {
-                            // get file
-                            fileToMove = file;
-                            // remove file here
-                            self.files.remove(file);
+                        if (file != null) {
+                            if (file.g == fileToMoveID) {
+                                // get file
+                                fileToMove = file;
+                                // remove file here
+                                self.files.remove(file);
+                            }
                         }
                     });
 
@@ -539,6 +482,7 @@
                         }
                     });
 
+                    // need dfs here !
                     var folderDestination = null;
                     ko.utils.arrayForEach(folders, function (f) {
                         if (f.g == destFolderID) {
