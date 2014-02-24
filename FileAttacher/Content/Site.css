@@ -109,11 +109,11 @@ ul {margin-bottom:0px}
 }
 
 .droppable-area {
-    background:#eee;
+    background:#ddd;
 }
 
 .droppable-area-hover {
-    background: #bbd9db;
+    background: #dff0d8;
 }
 
 .underline {
@@ -132,14 +132,23 @@ ul {margin-bottom:0px}
     font-size:18px;
 }
 
-.folder-nav .crumb {
+.crumb {
     color:#0088cc;
     cursor:pointer; 
 }
 
-.folder-nav .crumb:not(.inactive):hover {
+.crumb:not(.inactive):hover {
     color:#0088cc;
     cursor:pointer; 
+    text-decoration: underline;
+}
+
+.crumb-drop-active:not(.inactive) {
+    color:#468847;
+}
+
+.crumb-drop-hover:not(.inactive) {
+    color:#468847;
     text-decoration: underline;
 }
 

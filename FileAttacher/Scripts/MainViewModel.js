@@ -160,6 +160,10 @@
             dragDrop().go();
         }
     }
+
+    navToWFile = function (file) {
+
+    }
      
 
     /////////////////////////////////////////////////////////
@@ -197,7 +201,7 @@
                                         $('<span class="drag-table-item"><i class="icon-file"></i>' + z.text() + '</span>');
                                 }, cursor: "pointer",
                                 cursorAt: { top: 0, left: 0, right: 25, bottom: 0 },
-                                opacity: .85,
+                                opacity: .65,
                                 containment: mainContainer,
                             });
                         }
@@ -220,7 +224,7 @@
                             },
                             cursor: "pointer",
                             cursorAt: { top: 0, left: 0, right: 25, bottom: 0 },
-                            opacity: .85,
+                            opacity: .65,
                             containment: mainContainer,
                         });
 
@@ -242,8 +246,6 @@
                                 }
                             },
                             hoverClass: 'droppable-area-hover'
-                            //over: onFolderHover,
-                            //out: onFolderHoverExit,
                         });
 
                         //set hover
@@ -260,13 +262,18 @@
             }
 
             if (breadcrumbs.length > 0) {
+                var i = 0;
                 ko.utils.arrayForEach(breadcrumbs, function (crumb) {
+                    console.log(crumb);
                     if (crumb != null) {
-                        var _f = $('#' + crumb.g);
-                        
+                        //var _f = $('li > span[id=crumb' + i + ']');
+                        var _f = $("#breadcrumbs li >span");
+
                         _f.droppable({
-                            //activeClass: 
+                            activeClass: 'crumb-drop-active',
                             drop: function () {
+                                console.log('ehy');
+                                /*
                                 if (itemToMove != null) {
                                     if (itemToMove.MimeType === "folder") {
                                         self.moveFolder(self.currFolderId(), itemToMove.g, crumb.g);
@@ -278,10 +285,12 @@
                                 }
                                 else {
                                     console.log("itemToMove is null");
-                                }
+                                }*/
                             },
+                            hoverClass: 'crumb-drop-hover',
                         });
                     }
+                    i++;
                 });
             }
         }
