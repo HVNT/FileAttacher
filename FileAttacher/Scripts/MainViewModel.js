@@ -169,7 +169,7 @@
                                 },
                                 cursor: "pointer",
                                 cursorAt: { top: 0, left: 0, right: 25, bottom: 0 },
-                                opacity: .65,
+                                opacity: .90,
                                 containment: mainContainer,
                             });
                         }
@@ -192,7 +192,7 @@
                             },
                             cursor: "pointer",
                             cursorAt: { top: 0, left: 0, right: 25, bottom: 0 },
-                            opacity: .65,
+                            opacity: .90,
                             containment: mainContainer,
                         });
 
@@ -350,21 +350,27 @@
     self.removeFolder = function (folder) {
         var f = folder;
 
-        $.ajax({
-            type: "POST",
-            contentType: "application/json",
-            dataType: "json",
-            url: "/api/v1/Folder/RemoveFolder",
-            data: JSON.stringify({ centerIndex: careCenterID, folderID: f.g }), // file guid
-            success: function (data) {
-                console.log(data);
-                //remove from view.. give some response like a delay fade to show delete
-                self.folders.remove(f);
-            },
-            error: function (data) {
-                console.log(data);
-            }
-        });
+        var r = confirm("Are you sure? Remember, this will remove all of the files and folders contained too!");
+        if (r == true) {
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                dataType: "json",
+                url: "/api/v1/Folder/RemoveFolder",
+                data: JSON.stringify({ centerIndex: careCenterID, folderID: f.g }), // file guid
+                success: function (data) {
+                    console.log(data);
+                    //remove from view.. give some response like a delay fade to show delete
+                    self.folders.remove(f);
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+            });
+        }
+        else {
+            console.log("cancelled folder remove.");
+        }
     }
 
     /*
@@ -524,7 +530,6 @@
                     var folders = self.folders();
                     var folderToMove = null;
 
-                    console.log(folders);
                     ko.utils.arrayForEach(folders, function (folder) {
                         if (typeof folder !== "undefined") {
                             if (folder.g == folderToMoveID) {
